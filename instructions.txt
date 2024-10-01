@@ -13,3 +13,12 @@ Start Sequence: Power, hydraulic, then hold run button to start wind tunnel.
 First run, pressure set as approximately Mach 3.
 
 We do a shadow graph for each Mach, vertical Schleren, horizontal schleren.
+
+Step 1:
+
+Hit run at the top of LabView, once pressure is visible, the computer operator gives the wind tunnel operator a thumbs up. 
+
+The wind tunnel operator runs the wind tunnel. The computer operator waits until pressure stabilizes, takes a picture using the save button, then gives another thumbs up. The wind tunnel only runs while the run button is being held. Once the run button is let go, wait until the sound of airflow stops then turn off hydraulic then power.
+
+Starting at Mach 3 and descending by 0.25.
+
