@@ -1,0 +1,42 @@
+Lab Setup:
+
+Materials:
+30/30, 5mm grid points calibration sheet
+- use 10 grid spaces = 50mm, figure out pixels vs uncertainty.
+
+
+First take a blank image without calibration sheet
+- take another image with calibration sheet
+
+Start Sequence: Power, hydraulic, then hold run button to start wind tunnel.
+
+First run, pressure set as approximately Mach 3.
+
+We do a shadow graph for each Mach, vertical Schlieren, and horizontal Schlieren.
+
+Step 1:
+
+Hit run at the top of LabView, once pressure is visible, the computer operator gives the wind tunnel operator a thumbs up. 
+
+The wind tunnel operator runs the wind tunnel. The computer operator waits until pressure stabilizes, takes a picture using the save button, then gives another thumbs up. The wind tunnel only runs while the run button is being held. Once the run button is let go, wait until the sound of airflow stops then turn off hydraulic then power.
+
+Starting at Mach 3 and descending by 0.25.
+
+Ignore the first chunk of data, ignore first column for time, second column is P_0, third column is freestream (values in gauge pressure in volts)
+
+For the Schlieren analysis, take a knife edge and place at the focal point of the 
+
+Pick the latest one for the dataset.
+
+Changing the area and chamber pressure to alter the mach number. To manufacturers specficiations. (Refer to mach chart; Approximate Minimum Stagnation Pressure vs Mach Number).
+
+NOTE: 
+    - Schliern visual better at displaying density gradient
+    - Lighting in some of the images may be to high exposure/brightness
+    - Observation : Fog on the glass shows the shape of the Bow Shock (3D Effect)
+
+Don't crank too hard
+
+Keep eye on the pressure of the tank when running (compressed air in the tank gets low and runs are not as good).
+
+Ryan is grading the lab reports, follow the instructions (follow the rubric)
