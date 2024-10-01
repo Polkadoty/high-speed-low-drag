@@ -1,0 +1,15 @@
+Lab Setup:
+
+Materials:
+30/30, 5mm grid points calibration sheet
+- use 10 grid spaces = 50mm, figure out pixels vs uncertainty.
+
+
+First take a blank image without calibration sheet
+- take another image with calibration sheet
+
+Start Sequence: Power, hydraulic, then hold run button to start wind tunnel.
+
+First run, pressure set as approximately Mach 3.
+
+We do a shadow graph for each Mach, vertical Schleren, horizontal schleren.
