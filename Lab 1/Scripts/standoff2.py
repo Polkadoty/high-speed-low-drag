@@ -1,6 +1,9 @@
+import os
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import re
+import argparse  # Add this import
 
 def onclick(event):
     global points
@@ -74,10 +77,59 @@ def measure_shock_standoff(image_path, calibration_factor):
 
     return standoff_distance_mm, sphere_diameter_mm
 
-# Usage
-image_path = "Lab 1\Data\Images\M1_75_horizontal.bmp"
-calibration_factor = 14.3  # pixels/mm, as you provided
-standoff, diameter = measure_shock_standoff(image_path, calibration_factor)
-if standoff is not None:
-    print(f"Shock standoff distance: {standoff:.2f} mm")
-    print(f"Sphere diameter: {diameter:.2f} mm")
+def process_all_images(folder_path, calibration_factor):
+    results = {}
+    for filename in os.listdir(folder_path):
+        if filename.endswith(('.bmp', '.jpg', '.png')):  # Add or remove file extensions as needed
+            image_path = os.path.join(folder_path, filename)
+            print(f"Processing {filename}...")
+            
+            standoff, diameter = measure_shock_standoff(image_path, calibration_factor)
+            
+            if standoff is not None:
+                # Extract Mach number from filename (assuming format like 'M1_75_horizontal.bmp')
+                match = re.search(r'M(\d+)_(\d+)', filename)
+                if match:
+                    mach_number = float(f"{match.group(1)}.{match.group(2)}")
+                    results[mach_number] = {'diameter': diameter, 'standoff': standoff}
+                    print(f"Mach {mach_number}: Shock standoff distance: {standoff:.2f} mm, Sphere diameter: {diameter:.2f} mm")
+                else:
+                    print(f"Warning: Couldn't extract Mach number from filename {filename}")
+            else:
+                print(f"Warning: Couldn't process {filename}")
+    
+    return results
+
+# Add this function to parse command-line arguments
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Process shock standoff images.")
+    parser.add_argument("-image", type=str, help="Path to a specific image to process")
+    return parser.parse_args()
+
+# Modify the main part of the script
+if __name__ == "__main__":
+    args = parse_arguments()
+    
+    # Usage
+    folder_path = r"Lab 1\Data\Images"
+    calibration_factor = 14.3  # pixels/mm, as you provided
+
+    if args.image:
+        # Process a single image
+        image_path = args.image
+        print(f"Processing single image: {image_path}")
+        standoff, diameter = measure_shock_standoff(image_path, calibration_factor)
+        if standoff is not None:
+            print(f"Shock standoff distance: {standoff:.2f} mm, Sphere diameter: {diameter:.2f} mm")
+        else:
+            print(f"Warning: Couldn't process {image_path}")
+    else:
+        # Process all images in the folder
+        data_dict = process_all_images(folder_path, calibration_factor)
+
+        # Now you can use data_dict for further analysis
+        print("\nProcessed data:")
+        for mach, data in data_dict.items():
+            print(f"Mach {mach}: diameter = {data['diameter']:.2f} mm, standoff = {data['standoff']:.2f} mm")
+
+
