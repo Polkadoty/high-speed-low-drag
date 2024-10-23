@@ -1,0 +1,131 @@
+function cal_factor = calculate_calibration_factor(image_path, grid_spacing_mm)
+    if nargin < 2
+        grid_spacing_mm = 5;
+    end
+    
+    global points;
+    points = [];
+    
+    % Read the image
+    img = imread(image_path);
+    
+    % Display the image and wait for point selection
+    fig = figure;
+    imshow(img);
+    title('Click on two points 10 grid spaces apart');
+    set(fig, 'WindowButtonDownFcn', @onclick);
+    uiwait(fig);
+    
+    if length(points) ~= 2
+        disp('Error: Two points were not selected.');
+        cal_factor = NaN;
+        return;
+    end
+    
+    % Calculate distance between selected points
+    distance_px = sqrt((points(2,1) - points(1,1))^2 + (points(2,2) - points(1,2))^2);
+    
+    % Calculate calibration factor (pixels per mm)
+    cal_factor = distance_px / (10 * grid_spacing_mm);
+    
+    % Visualize the selected points
+    figure;
+    imshow(img);
+    hold on;
+    plot([points(1,1), points(2,1)], [points(1,2), points(2,2)], 'r-');
+    plot(points(:,1), points(:,2), 'ro');
+    title(sprintf('Calibration: %.2f pixels/mm', cal_factor));
+    hold off;
+end
+
+function onclick(~, eventdata)
+    global points;
+    if length(points) < 2
+        points = [points; eventdata.IntersectionPoint(1:2)];
+        hold on;
+        plot(eventdata.IntersectionPoint(1), eventdata.IntersectionPoint(2), 'ro');
+        hold off;
+        if length(points) == 2
+            uiresume;
+        end
+    end
+end
+
+% Usage
+calibration_image_path = 'Lab 1\Data\Images\Wind_off_calibrate.bmp';
+cal_factor = calculate_calibration_factor(calibration_image_path);
+if ~isnan(cal_factor)
+    fprintf('Calibration factor: %.2f pixels/mm\n', cal_factor);
+end
+
+---
+
+function [standoff, diameter] = measure_shock_standoff(image_path, calibration_factor)
+    global points;
+    points = [];
+    
+    % Read the image
+    img = imread(image_path);
+    
+    % Display the image and wait for point selection
+    fig = figure('Position', [100, 100, 800, 600]);
+    imshow(img);
+    title('Click to select: 1) Sphere center, 2) Sphere edge, 3) Shock wave point');
+    set(fig, 'WindowButtonDownFcn', @onclick);
+    uiwait(fig);
+    
+    if length(points) ~= 3
+        disp('Error: Three points were not selected.');
+        standoff = NaN;
+        diameter = NaN;
+        return;
+    end
+    
+    % Calculate distances
+    center = points(1,:);
+    edge = points(2,:);
+    shock = points(3,:);
+    sphere_radius = sqrt((edge(1) - center(1))^2 + (edge(2) - center(2))^2);
+    shock_distance = sqrt((shock(1) - center(1))^2 + (shock(2) - center(2))^2);
+    
+    % Calculate standoff distance
+    standoff_distance_px = shock_distance - sphere_radius;
+    standoff_distance_mm = standoff_distance_px / calibration_factor;
+    sphere_diameter_mm = (2 * sphere_radius) / calibration_factor;
+    
+    % Visualize the measurement
+    figure('Position', [100, 100, 800, 600]);
+    imshow(img);
+    hold on;
+    viscircles(center, sphere_radius, 'Color', 'r', 'LineWidth', 1);
+    plot([center(1), shock(1)], [center(2), shock(2)], 'b-');
+    plot(points(:,1), points(:,2), 'ro');
+    title(sprintf('Shock Standoff Distance: %.2f mm\nSphere Diameter: %.2f mm', ...
+          standoff_distance_mm, sphere_diameter_mm));
+    hold off;
+    
+    standoff = standoff_distance_mm;
+    diameter = sphere_diameter_mm;
+end
+
+function onclick(~, eventdata)
+    global points;
+    if length(points) < 3
+        points = [points; eventdata.IntersectionPoint(1:2)];
+        hold on;
+        plot(eventdata.IntersectionPoint(1), eventdata.IntersectionPoint(2), 'ro');
+        hold off;
+        if length(points) == 3
+            uiresume;
+        end
+    end
+end
+
+% Usage
+image_path = 'path_to_shock_image.bmp';
+calibration_factor = 14.3;  % pixels/mm, as you provided
+[standoff, diameter] = measure_shock_standoff(image_path, calibration_factor);
+if ~isnan(standoff)
+    fprintf('Shock standoff distance: %.2f mm\n', standoff);
+    fprintf('Sphere diameter: %.2f mm\n', diameter);
+end
