@@ -1,0 +1,347 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+    \PYG{k+kn}{import} \PYG{n+nn}{os}
+    \PYG{k+kn}{import} \PYG{n+nn}{re}
+    \PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
+    \PYG{k+kn}{import} \PYG{n+nn}{matplotlib.pyplot} \PYG{k}{as} \PYG{n+nn}{plt}
+    \PYG{k+kn}{from} \PYG{n+nn}{scipy.signal} \PYG{k+kn}{import} \PYG{n}{find\PYGZus{}peaks}
+    \PYG{k+kn}{from} \PYG{n+nn}{scipy.optimize} \PYG{k+kn}{import} \PYG{n}{fsolve}\PYG{p}{,} \PYG{n}{curve\PYGZus{}fit}
+
+    \PYG{k}{def} \PYG{n+nf}{read\PYGZus{}data\PYGZus{}file}\PYG{p}{(}\PYG{n}{file\PYGZus{}path}\PYG{p}{):}
+        \PYG{k}{with} \PYG{n+nb}{open}\PYG{p}{(}\PYG{n}{file\PYGZus{}path}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}r\PYGZsq{}}\PYG{p}{)} \PYG{k}{as} \PYG{n}{f}\PYG{p}{:}
+            \PYG{n}{lines} \PYG{o}{=} \PYG{n}{f}\PYG{o}{.}\PYG{n}{readlines}\PYG{p}{()}
+
+        \PYG{n}{data\PYGZus{}start} \PYG{o}{=} \PYG{n+nb}{next}\PYG{p}{(}\PYG{n}{i} \PYG{k}{for} \PYG{n}{i}\PYG{p}{,} \PYG{n}{line} \PYG{o+ow}{in} \PYG{n+nb}{enumerate}\PYG{p}{(}\PYG{n}{lines}\PYG{p}{)} \PYG{k}{if} \PYG{l+s+s2}{\PYGZdq{}X\PYGZus{}Value\PYGZdq{}} \PYG{o+ow}{in} \PYG{n}{line}\PYG{p}{)}
+        \PYG{n}{data} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{genfromtxt}\PYG{p}{(}\PYG{n}{lines}\PYG{p}{[}\PYG{n}{data\PYGZus{}start}\PYG{o}{+}\PYG{l+m+mi}{1}\PYG{p}{:],} \PYG{n}{delimiter}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}}\PYG{l+s+se}{\PYGZbs{}t}\PYG{l+s+s1}{\PYGZsq{}}\PYG{p}{,} \PYG{n}{usecols}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{))}
+        \PYG{k}{return} \PYG{n}{data}
+
+    \PYG{k}{def} \PYG{n+nf}{voltage\PYGZus{}to\PYGZus{}pressure}\PYG{p}{(}\PYG{n}{voltage}\PYG{p}{,} \PYG{n}{conversion\PYGZus{}factor}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{voltage} \PYG{o}{*} \PYG{p}{(}\PYG{n}{conversion\PYGZus{}factor} \PYG{o}{/} \PYG{l+m+mf}{0.1}\PYG{p}{)}
+
+    \PYG{k}{def} \PYG{n+nf}{find\PYGZus{}steady\PYGZus{}state}\PYG{p}{(}\PYG{n}{data}\PYG{p}{,} \PYG{n}{window\PYGZus{}size}\PYG{o}{=}\PYG{l+m+mi}{50}\PYG{p}{):}
+        \PYG{c+c1}{\PYGZsh{} Find the index of the maximum pressure}
+        \PYG{n}{peak\PYGZus{}index} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{argmax}\PYG{p}{(}\PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{data}\PYG{p}{))}
+
+        \PYG{c+c1}{\PYGZsh{} Define a region around the peak to search for the steady state}
+        \PYG{n}{search\PYGZus{}start} \PYG{o}{=} \PYG{n+nb}{max}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{,} \PYG{n}{peak\PYGZus{}index} \PYG{o}{\PYGZhy{}} \PYG{n}{window\PYGZus{}size}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{)}
+        \PYG{n}{search\PYGZus{}end} \PYG{o}{=} \PYG{n+nb}{min}\PYG{p}{(}\PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{data}\PYG{p}{),} \PYG{n}{peak\PYGZus{}index} \PYG{o}{+} \PYG{n}{window\PYGZus{}size}\PYG{o}{*}\PYG{l+m+mi}{2}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate moving standard deviation}
+        \PYG{n}{std\PYGZus{}dev} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{([}\PYG{n}{np}\PYG{o}{.}\PYG{n}{std}\PYG{p}{(}\PYG{n}{data}\PYG{p}{[}\PYG{n}{i}\PYG{p}{:}\PYG{n}{i}\PYG{o}{+}\PYG{n}{window\PYGZus{}size}\PYG{p}{])} \PYG{k}{for} \PYG{n}{i} \PYG{o+ow}{in} \PYG{n+nb}{range}\PYG{p}{(}\PYG{n}{search\PYGZus{}start}\PYG{p}{,} \PYG{n}{search\PYGZus{}end}\PYG{o}{\PYGZhy{}}\PYG{n}{window\PYGZus{}size}\PYG{p}{)])}
+
+        \PYG{c+c1}{\PYGZsh{} Find the region with the lowest standard deviation (most stable)}
+        \PYG{n}{stable\PYGZus{}start} \PYG{o}{=} \PYG{n}{search\PYGZus{}start} \PYG{o}{+} \PYG{n}{np}\PYG{o}{.}\PYG{n}{argmin}\PYG{p}{(}\PYG{n}{std\PYGZus{}dev}\PYG{p}{)}
+
+        \PYG{k}{return} \PYG{n}{stable\PYGZus{}start}\PYG{p}{,} \PYG{n}{stable\PYGZus{}start} \PYG{o}{+} \PYG{n}{window\PYGZus{}size}
+
+    \PYG{k}{def} \PYG{n+nf}{calculate\PYGZus{}mach\PYGZus{}number}\PYG{p}{(}\PYG{n}{p0\PYGZus{}gauge}\PYG{p}{,} \PYG{n}{p\PYGZus{}gauge}\PYG{p}{,} \PYG{n}{p\PYGZus{}atm}\PYG{o}{=}\PYG{l+m+mf}{14.7}\PYG{p}{,} \PYG{n}{gamma}\PYG{o}{=}\PYG{l+m+mf}{1.4}\PYG{p}{):}
+        \PYG{c+c1}{\PYGZsh{} Convert gauge pressures to absolute pressures}
+        \PYG{n}{p0} \PYG{o}{=} \PYG{n}{p0\PYGZus{}gauge} \PYG{o}{+} \PYG{n}{p\PYGZus{}atm}
+        \PYG{n}{p} \PYG{o}{=} \PYG{n}{p\PYGZus{}gauge} \PYG{o}{+} \PYG{n}{p\PYGZus{}atm}
+
+        \PYG{k}{if} \PYG{n}{p0} \PYG{o}{\PYGZlt{}=} \PYG{n}{p} \PYG{o+ow}{or} \PYG{n}{p} \PYG{o}{\PYGZlt{}=} \PYG{l+m+mi}{0}\PYG{p}{:}
+            \PYG{k}{return} \PYG{n}{np}\PYG{o}{.}\PYG{n}{nan}
+
+        \PYG{c+c1}{\PYGZsh{} Use the correct isentropic flow equation for Mach number}
+        \PYG{n}{mach} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{((}\PYG{l+m+mi}{2} \PYG{o}{/} \PYG{p}{(}\PYG{n}{gamma} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{))} \PYG{o}{*} \PYG{p}{((}\PYG{n}{p0} \PYG{o}{/} \PYG{n}{p}\PYG{p}{)}\PYG{o}{**}\PYG{p}{((}\PYG{n}{gamma} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{/} \PYG{n}{gamma}\PYG{p}{)} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{))}
+
+        \PYG{k}{return} \PYG{n}{mach}
+
+    \PYG{k}{def} \PYG{n+nf}{calculate\PYGZus{}reynolds\PYGZus{}numbers}\PYG{p}{(}\PYG{n}{mach\PYGZus{}number}\PYG{p}{,} \PYG{n}{pressure}\PYG{p}{,} \PYG{n}{temperature}\PYG{p}{,} \PYG{n}{diameter}\PYG{p}{):}
+        \PYG{c+c1}{\PYGZsh{} Constants}
+        \PYG{n}{gamma} \PYG{o}{=} \PYG{l+m+mf}{1.4}  \PYG{c+c1}{\PYGZsh{} Ratio of specific heats for air}
+        \PYG{n}{R} \PYG{o}{=} \PYG{l+m+mf}{287.05}  \PYG{c+c1}{\PYGZsh{} Gas constant for air in J/(kg·K)}
+
+        \PYG{c+c1}{\PYGZsh{} Sutherland\PYGZsq{}s law constants}
+        \PYG{n}{C} \PYG{o}{=} \PYG{l+m+mi}{120}  \PYG{c+c1}{\PYGZsh{} Sutherland\PYGZsq{}s constant for air in K}
+        \PYG{n}{T0} \PYG{o}{=} \PYG{l+m+mf}{291.15}  \PYG{c+c1}{\PYGZsh{} Reference temperature in K}
+        \PYG{n}{mu0} \PYG{o}{=} \PYG{l+m+mf}{1.827e\PYGZhy{}5}  \PYG{c+c1}{\PYGZsh{} Reference viscosity in Pa·s}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate temperature ratio}
+        \PYG{n}{T\PYGZus{}ratio} \PYG{o}{=} \PYG{l+m+mi}{1} \PYG{o}{+} \PYG{p}{(}\PYG{n}{gamma} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{/} \PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{mach\PYGZus{}number}\PYG{o}{**}\PYG{l+m+mi}{2}
+        \PYG{n}{T} \PYG{o}{=} \PYG{n}{temperature} \PYG{o}{*} \PYG{n}{T\PYGZus{}ratio}  \PYG{c+c1}{\PYGZsh{} Static temperature}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate density}
+        \PYG{n}{rho} \PYG{o}{=} \PYG{n}{pressure} \PYG{o}{/} \PYG{p}{(}\PYG{n}{R} \PYG{o}{*} \PYG{n}{T}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate velocity}
+        \PYG{n}{V} \PYG{o}{=} \PYG{n}{mach\PYGZus{}number} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{gamma} \PYG{o}{*} \PYG{n}{R} \PYG{o}{*} \PYG{n}{T}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate viscosity using Sutherland\PYGZsq{}s law}
+        \PYG{n}{mu} \PYG{o}{=} \PYG{n}{mu0} \PYG{o}{*} \PYG{p}{(}\PYG{n}{T} \PYG{o}{/} \PYG{n}{T0}\PYG{p}{)}\PYG{o}{**}\PYG{p}{(}\PYG{l+m+mi}{3}\PYG{o}{/}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{*} \PYG{p}{(}\PYG{n}{T0} \PYG{o}{+} \PYG{n}{C}\PYG{p}{)} \PYG{o}{/} \PYG{p}{(}\PYG{n}{T} \PYG{o}{+} \PYG{n}{C}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate Reynolds numbers}
+        \PYG{n}{Re\PYGZus{}unit} \PYG{o}{=} \PYG{n}{rho} \PYG{o}{*} \PYG{n}{V} \PYG{o}{/} \PYG{n}{mu}
+        \PYG{n}{Re\PYGZus{}D} \PYG{o}{=} \PYG{n}{Re\PYGZus{}unit} \PYG{o}{*} \PYG{n}{diameter}
+
+        \PYG{k}{return} \PYG{n}{Re\PYGZus{}unit}\PYG{p}{,} \PYG{n}{Re\PYGZus{}D}
+
+    \PYG{k}{def} \PYG{n+nf}{mach\PYGZus{}number\PYGZus{}uncertainty}\PYG{p}{(}\PYG{n}{p0}\PYG{p}{,} \PYG{n}{p}\PYG{p}{,} \PYG{n}{dp0}\PYG{p}{,} \PYG{n}{dp}\PYG{p}{,} \PYG{n}{gamma}\PYG{o}{=}\PYG{l+m+mf}{1.4}\PYG{p}{):}
+        \PYG{c+c1}{\PYGZsh{} Function to solve for Mach number}
+        \PYG{k}{def} \PYG{n+nf}{mach\PYGZus{}equation}\PYG{p}{(}\PYG{n}{M}\PYG{p}{):}
+            \PYG{k}{return} \PYG{p}{(}\PYG{n}{p0}\PYG{o}{/}\PYG{n}{p}\PYG{p}{)} \PYG{o}{\PYGZhy{}} \PYG{p}{(}\PYG{l+m+mi}{1} \PYG{o}{+} \PYG{p}{(}\PYG{n}{gamma}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{/}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{M}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{o}{**}\PYG{p}{(}\PYG{n}{gamma}\PYG{o}{/}\PYG{p}{(}\PYG{n}{gamma}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{))}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate Mach number}
+        \PYG{n}{M} \PYG{o}{=} \PYG{n}{fsolve}\PYG{p}{(}\PYG{n}{mach\PYGZus{}equation}\PYG{p}{,} \PYG{l+m+mf}{1.0}\PYG{p}{)[}\PYG{l+m+mi}{0}\PYG{p}{]}
+
+        \PYG{c+c1}{\PYGZsh{} Partial derivatives}
+        \PYG{n}{dM\PYGZus{}dp0} \PYG{o}{=} \PYG{n}{M} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{p0}\PYG{p}{)} \PYG{o}{*} \PYG{p}{(}\PYG{l+m+mi}{1} \PYG{o}{+} \PYG{p}{(}\PYG{n}{gamma}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{/}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{M}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+        \PYG{n}{dM\PYGZus{}dp} \PYG{o}{=} \PYG{o}{\PYGZhy{}}\PYG{n}{M} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{2}\PYG{o}{*}\PYG{n}{p}\PYG{p}{)} \PYG{o}{*} \PYG{p}{(}\PYG{l+m+mi}{1} \PYG{o}{+} \PYG{p}{(}\PYG{n}{gamma}\PYG{o}{\PYGZhy{}}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{/}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{M}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Uncertainty propagation}
+        \PYG{n}{dM} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{((}\PYG{n}{dM\PYGZus{}dp0} \PYG{o}{*} \PYG{n}{dp0}\PYG{p}{)}\PYG{o}{**}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{p}{(}\PYG{n}{dM\PYGZus{}dp} \PYG{o}{*} \PYG{n}{dp}\PYG{p}{)}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+
+        \PYG{k}{return} \PYG{n}{M}\PYG{p}{,} \PYG{n}{dM}
+
+    \PYG{k}{def} \PYG{n+nf}{process\PYGZus{}file}\PYG{p}{(}\PYG{n}{file\PYGZus{}path}\PYG{p}{):}
+        \PYG{n}{data} \PYG{o}{=} \PYG{n}{read\PYGZus{}data\PYGZus{}file}\PYG{p}{(}\PYG{n}{file\PYGZus{}path}\PYG{p}{)}
+
+        \PYG{n}{stagnation\PYGZus{}pressure} \PYG{o}{=} \PYG{n}{voltage\PYGZus{}to\PYGZus{}pressure}\PYG{p}{(}\PYG{n}{data}\PYG{p}{[:,} \PYG{l+m+mi}{0}\PYG{p}{],} \PYG{l+m+mi}{60}\PYG{p}{)}
+        \PYG{n}{static\PYGZus{}pressure} \PYG{o}{=} \PYG{n}{voltage\PYGZus{}to\PYGZus{}pressure}\PYG{p}{(}\PYG{n}{data}\PYG{p}{[:,} \PYG{l+m+mi}{1}\PYG{p}{],} \PYG{l+m+mi}{15}\PYG{p}{)}
+
+        \PYG{n}{start}\PYG{p}{,} \PYG{n}{end} \PYG{o}{=} \PYG{n}{find\PYGZus{}steady\PYGZus{}state}\PYG{p}{(}\PYG{n}{stagnation\PYGZus{}pressure}\PYG{p}{)}
+
+        \PYG{n}{avg\PYGZus{}stagnation\PYGZus{}pressure} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{stagnation\PYGZus{}pressure}\PYG{p}{[}\PYG{n}{start}\PYG{p}{:}\PYG{n}{end}\PYG{p}{])}
+        \PYG{n}{avg\PYGZus{}static\PYGZus{}pressure} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{static\PYGZus{}pressure}\PYG{p}{[}\PYG{n}{start}\PYG{p}{:}\PYG{n}{end}\PYG{p}{])}
+
+        \PYG{n}{mach\PYGZus{}number}\PYG{p}{,} \PYG{n}{mach\PYGZus{}uncertainty} \PYG{o}{=} \PYG{n}{mach\PYGZus{}number\PYGZus{}uncertainty}\PYG{p}{(}\PYG{n}{avg\PYGZus{}stagnation\PYGZus{}pressure} \PYG{o}{+} \PYG{l+m+mf}{14.7}\PYG{p}{,}
+                                                                \PYG{n}{avg\PYGZus{}static\PYGZus{}pressure} \PYG{o}{+} \PYG{l+m+mf}{14.7}\PYG{p}{,}
+                                                                \PYG{l+m+mf}{0.01} \PYG{o}{*} \PYG{n}{avg\PYGZus{}stagnation\PYGZus{}pressure}\PYG{p}{,}
+                                                                \PYG{l+m+mf}{0.01} \PYG{o}{*} \PYG{n}{avg\PYGZus{}static\PYGZus{}pressure}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate Reynolds numbers}
+        \PYG{n}{diameter} \PYG{o}{=} \PYG{l+m+mf}{0.0163}  \PYG{c+c1}{\PYGZsh{} Sphere diameter in meters}
+        \PYG{n}{Re\PYGZus{}unit}\PYG{p}{,} \PYG{n}{Re\PYGZus{}D} \PYG{o}{=} \PYG{n}{calculate\PYGZus{}reynolds\PYGZus{}numbers}\PYG{p}{(}\PYG{n}{mach\PYGZus{}number}\PYG{p}{,} \PYG{n}{avg\PYGZus{}static\PYGZus{}pressure} \PYG{o}{*} \PYG{l+m+mf}{6894.75729}\PYG{p}{,}  \PYG{c+c1}{\PYGZsh{} Convert psi to Pa}
+                                                \PYG{l+m+mi}{297}\PYG{p}{,} \PYG{n}{diameter}\PYG{p}{)}  \PYG{c+c1}{\PYGZsh{} Assuming 297 K (24°C) ambient temperature}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate Reynolds number uncertainty (simplified, assuming only Mach number contributes significantly)}
+        \PYG{n}{dRe\PYGZus{}D} \PYG{o}{=} \PYG{n}{Re\PYGZus{}D} \PYG{o}{*} \PYG{n}{mach\PYGZus{}uncertainty} \PYG{o}{/} \PYG{n}{mach\PYGZus{}number}
+
+        \PYG{c+c1}{\PYGZsh{} Visualize the data}
+        \PYG{c+c1}{\PYGZsh{} plt.figure(figsize=(12, 6))}
+        \PYG{c+c1}{\PYGZsh{} plt.plot(stagnation\PYGZus{}pressure, label=\PYGZsq{}Stagnation Pressure\PYGZsq{})}
+        \PYG{c+c1}{\PYGZsh{} plt.plot(static\PYGZus{}pressure, label=\PYGZsq{}Static Pressure\PYGZsq{})}
+        \PYG{c+c1}{\PYGZsh{} plt.axvline(start, color=\PYGZsq{}r\PYGZsq{}, linestyle=\PYGZsq{}\PYGZhy{}\PYGZhy{}\PYGZsq{}, label=\PYGZsq{}Steady State Start\PYGZsq{})}
+        \PYG{c+c1}{\PYGZsh{} plt.axvline(end, color=\PYGZsq{}r\PYGZsq{}, linestyle=\PYGZsq{}\PYGZhy{}\PYGZhy{}\PYGZsq{}, label=\PYGZsq{}Steady State End\PYGZsq{})}
+        \PYG{c+c1}{\PYGZsh{} plt.axhline(avg\PYGZus{}stagnation\PYGZus{}pressure, color=\PYGZsq{}g\PYGZsq{}, linestyle=\PYGZsq{}:\PYGZsq{}, label=\PYGZsq{}Avg Stagnation\PYGZsq{})}
+        \PYG{c+c1}{\PYGZsh{} plt.axhline(avg\PYGZus{}static\PYGZus{}pressure, color=\PYGZsq{}m\PYGZsq{}, linestyle=\PYGZsq{}:\PYGZsq{}, label=\PYGZsq{}Avg Static\PYGZsq{})}
+        \PYG{c+c1}{\PYGZsh{} plt.legend()}
+        \PYG{c+c1}{\PYGZsh{} plt.title(f\PYGZsq{}Pressure Data for \PYGZob{}os.path.basename(file\PYGZus{}path)\PYGZcb{}\PYGZsq{})}
+        \PYG{c+c1}{\PYGZsh{} plt.xlabel(\PYGZsq{}Sample\PYGZsq{})}
+        \PYG{c+c1}{\PYGZsh{} plt.ylabel(\PYGZsq{}Pressure (psi)\PYGZsq{})}
+        \PYG{c+c1}{\PYGZsh{} plt.show()}
+
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}File: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{basename}\PYG{p}{(}\PYG{n}{file\PYGZus{}path}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Stagnation Pressure (gauge): }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{avg\PYGZus{}stagnation\PYGZus{}pressure}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ psi\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Static Pressure (gauge): }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{avg\PYGZus{}static\PYGZus{}pressure}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ psi\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Stagnation Pressure (absolute): }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{avg\PYGZus{}stagnation\PYGZus{}pressure}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mf}{14.7}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ psi\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Static Pressure (absolute): }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{avg\PYGZus{}static\PYGZus{}pressure}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mf}{14.7}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ psi\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Pressure Ratio (p/p0): }\PYG{l+s+si}{\PYGZob{}}\PYG{p}{(}\PYG{n}{avg\PYGZus{}static\PYGZus{}pressure}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mf}{14.7}\PYG{p}{)}\PYG{+w}{ }\PYG{o}{/}\PYG{+w}{ }\PYG{p}{(}\PYG{n}{avg\PYGZus{}stagnation\PYGZus{}pressure}\PYG{+w}{ }\PYG{o}{+}\PYG{+w}{ }\PYG{l+m+mf}{14.7}\PYG{p}{)}\PYG{l+s+si}{:}\PYG{l+s+s2}{.4f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Calculated Mach Number: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{mach\PYGZus{}number}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Unit Reynolds Number: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{Re\PYGZus{}unit}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2e}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ 1/m\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Diametric Reynolds Number: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{Re\PYGZus{}D}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2e}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Reynolds Number Uncertainty: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{dRe\PYGZus{}D}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2e}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}\PYGZhy{}\PYGZhy{}\PYGZhy{}\PYGZdq{}}\PYG{p}{)}
+
+        \PYG{k}{return} \PYG{n}{mach\PYGZus{}number}\PYG{p}{,} \PYG{n}{mach\PYGZus{}uncertainty}\PYG{p}{,} \PYG{n}{avg\PYGZus{}stagnation\PYGZus{}pressure}\PYG{p}{,} \PYG{n}{avg\PYGZus{}static\PYGZus{}pressure}\PYG{p}{,} \PYG{n}{Re\PYGZus{}unit}\PYG{p}{,} \PYG{n}{Re\PYGZus{}D}\PYG{p}{,} \PYG{n}{dRe\PYGZus{}D}
+
+    \PYG{k}{def} \PYG{n+nf}{extract\PYGZus{}mach\PYGZus{}number}\PYG{p}{(}\PYG{n}{filename}\PYG{p}{):}
+        \PYG{n}{match} \PYG{o}{=} \PYG{n}{re}\PYG{o}{.}\PYG{n}{search}\PYG{p}{(}\PYG{l+s+sa}{r}\PYG{l+s+s1}{\PYGZsq{}M(\PYGZbs{}d+)\PYGZus{}(\PYGZbs{}d+)\PYGZsq{}}\PYG{p}{,} \PYG{n}{filename}\PYG{p}{)}
+        \PYG{k}{if} \PYG{n}{match}\PYG{p}{:}
+            \PYG{k}{return} \PYG{n+nb}{float}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{match}\PYG{o}{.}\PYG{n}{group}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{.}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{match}\PYG{o}{.}\PYG{n}{group}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+        \PYG{k}{return} \PYG{k+kc}{None}
+
+    \PYG{c+c1}{\PYGZsh{} Directory containing the data files}
+    \PYG{n}{data\PYGZus{}dir} \PYG{o}{=} \PYG{l+s+sa}{r}\PYG{l+s+s2}{\PYGZdq{}Lab 1\PYGZbs{}Working\PYGZhy{}data\PYGZdq{}}
+
+    \PYG{n}{results} \PYG{o}{=} \PYG{p}{[]}
+
+    \PYG{k}{for} \PYG{n}{filename} \PYG{o+ow}{in} \PYG{n}{os}\PYG{o}{.}\PYG{n}{listdir}\PYG{p}{(}\PYG{n}{data\PYGZus{}dir}\PYG{p}{):}
+        \PYG{k}{if} \PYG{n}{filename}\PYG{o}{.}\PYG{n}{endswith}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}.txt\PYGZdq{}}\PYG{p}{):}
+            \PYG{n}{file\PYGZus{}path} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{data\PYGZus{}dir}\PYG{p}{,} \PYG{n}{filename}\PYG{p}{)}
+            \PYG{n}{expected\PYGZus{}mach} \PYG{o}{=} \PYG{n}{extract\PYGZus{}mach\PYGZus{}number}\PYG{p}{(}\PYG{n}{filename}\PYG{p}{)}
+            \PYG{k}{if} \PYG{n}{expected\PYGZus{}mach}\PYG{p}{:}
+                \PYG{n}{calculated\PYGZus{}mach}\PYG{p}{,} \PYG{n}{mach\PYGZus{}uncertainty}\PYG{p}{,} \PYG{n}{stagnation\PYGZus{}p}\PYG{p}{,} \PYG{n}{static\PYGZus{}p}\PYG{p}{,} \PYG{n}{Re\PYGZus{}unit}\PYG{p}{,} \PYG{n}{Re\PYGZus{}D}\PYG{p}{,} \PYG{n}{dRe\PYGZus{}D} \PYG{o}{=} \PYG{n}{process\PYGZus{}file}\PYG{p}{(}\PYG{n}{file\PYGZus{}path}\PYG{p}{)}
+                \PYG{n}{results}\PYG{o}{.}\PYG{n}{append}\PYG{p}{((}\PYG{n}{expected\PYGZus{}mach}\PYG{p}{,} \PYG{n}{calculated\PYGZus{}mach}\PYG{p}{,} \PYG{n}{mach\PYGZus{}uncertainty}\PYG{p}{,} \PYG{n}{stagnation\PYGZus{}p}\PYG{p}{,} \PYG{n}{static\PYGZus{}p}\PYG{p}{,} \PYG{n}{Re\PYGZus{}unit}\PYG{p}{,} \PYG{n}{Re\PYGZus{}D}\PYG{p}{,} \PYG{n}{dRe\PYGZus{}D}\PYG{p}{))}
+                \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Processed }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{filename}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{: Expected M=}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{expected\PYGZus{}mach}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{, Calculated M=}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{calculated\PYGZus{}mach}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ ± }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{mach\PYGZus{}uncertainty}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Sort results by expected Mach number}
+    \PYG{n}{results}\PYG{o}{.}\PYG{n}{sort}\PYG{p}{(}\PYG{n}{key}\PYG{o}{=}\PYG{k}{lambda} \PYG{n}{x}\PYG{p}{:} \PYG{n}{x}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+
+    \PYG{c+c1}{\PYGZsh{} Plotting Mach number vs Re\PYGZus{}D with error bars (vertical only)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{(}\PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{6}\PYG{p}{))}
+    \PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{re\PYGZus{}d\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{re\PYGZus{}d\PYGZus{}uncertainties} \PYG{o}{=} \PYG{n+nb}{zip}\PYG{p}{(}\PYG{o}{*}\PYG{p}{[(}\PYG{n}{calc\PYGZus{}mach}\PYG{p}{,} \PYG{n}{re\PYGZus{}d}\PYG{p}{,} \PYG{n}{dre\PYGZus{}d}\PYG{p}{)}
+                                                        \PYG{k}{for} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{calc\PYGZus{}mach}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{re\PYGZus{}d}\PYG{p}{,} \PYG{n}{dre\PYGZus{}d} \PYG{o+ow}{in} \PYG{n}{results}\PYG{p}{])}
+
+    \PYG{c+c1}{\PYGZsh{} Use absolute values for uncertainties}
+    \PYG{n}{re\PYGZus{}d\PYGZus{}uncertainties} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{re\PYGZus{}d\PYGZus{}uncertainties}\PYG{p}{)}
+
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{errorbar}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{np}\PYG{o}{.}\PYG{n}{abs}\PYG{p}{(}\PYG{n}{re\PYGZus{}d\PYGZus{}numbers}\PYG{p}{),} \PYG{n}{yerr}\PYG{o}{=}\PYG{n}{re\PYGZus{}d\PYGZus{}uncertainties}\PYG{p}{,} \PYG{n}{fmt}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}o\PYGZsq{}}\PYG{p}{,} \PYG{n}{capsize}\PYG{o}{=}\PYG{l+m+mi}{5}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Mach Number\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Reynolds Number (Re\PYGZus{}D)\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Mach Number vs Reynolds Number with Uncertainties\PYGZsq{}}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{k+kc}{True}\PYG{p}{)}
+    \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+
+    \PYG{c+c1}{\PYGZsh{} Print results}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{Mach Number and Reynolds Number Comparison with Uncertainties:\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Expected M | Calculated M ± Uncertainty | Re\PYGZus{}D ± Uncertainty\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}\PYGZhy{}\PYGZdq{}} \PYG{o}{*} \PYG{l+m+mi}{70}\PYG{p}{)}
+    \PYG{k}{for} \PYG{n}{expected}\PYG{p}{,} \PYG{n}{calculated}\PYG{p}{,} \PYG{n}{mach\PYGZus{}unc}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{re\PYGZus{}d}\PYG{p}{,} \PYG{n}{dre\PYGZus{}d} \PYG{o+ow}{in} \PYG{n}{results}\PYG{p}{:}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{expected}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{       | }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{calculated}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ ± }\PYG{l+s+si}{\PYGZob{}}\PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{mach\PYGZus{}unc}\PYG{p}{)}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{              | }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{re\PYGZus{}d}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2e}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ ± }\PYG{l+s+si}{\PYGZob{}}\PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{dre\PYGZus{}d}\PYG{p}{)}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2e}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Calculate and print average error}
+    \PYG{n}{valid\PYGZus{}results} \PYG{o}{=} \PYG{p}{[(}\PYG{n}{exp}\PYG{p}{,} \PYG{n}{calc}\PYG{p}{)} \PYG{k}{for} \PYG{n}{exp}\PYG{p}{,} \PYG{n}{calc}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{\PYGZus{}}\PYG{p}{,} \PYG{n}{\PYGZus{}} \PYG{o+ow}{in} \PYG{n}{results} \PYG{k}{if} \PYG{o+ow}{not} \PYG{n}{np}\PYG{o}{.}\PYG{n}{isnan}\PYG{p}{(}\PYG{n}{calc}\PYG{p}{)]}
+    \PYG{k}{if} \PYG{n}{valid\PYGZus{}results}\PYG{p}{:}
+        \PYG{n}{errors} \PYG{o}{=} \PYG{p}{[}\PYG{n+nb}{abs}\PYG{p}{(}\PYG{n}{calc} \PYG{o}{\PYGZhy{}} \PYG{n}{exp}\PYG{p}{)} \PYG{k}{for} \PYG{n}{exp}\PYG{p}{,} \PYG{n}{calc} \PYG{o+ow}{in} \PYG{n}{valid\PYGZus{}results}\PYG{p}{]}
+        \PYG{n}{avg\PYGZus{}error} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{errors}\PYG{p}{)}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{Average Mach number error: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{avg\PYGZus{}error}\PYG{l+s+si}{:}\PYG{l+s+s2}{.4f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+    \PYG{k}{else}\PYG{p}{:}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{No valid Mach number calculations.\PYGZdq{}}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Add these new functions after the existing functions}
+
+    \PYG{k}{def} \PYG{n+nf}{calculate\PYGZus{}nondimensional\PYGZus{}standoff}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{diameters}\PYG{p}{,} \PYG{n}{standoff\PYGZus{}distances}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n}{standoff\PYGZus{}distances}\PYG{p}{)} \PYG{o}{/} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n}{diameters}\PYG{p}{)}
+
+    \PYG{k}{def} \PYG{n+nf}{qualitative\PYGZus{}scaling}\PYG{p}{(}\PYG{n}{M}\PYG{p}{,} \PYG{n}{c}\PYG{p}{,} \PYG{n}{gamma}\PYG{o}{=}\PYG{l+m+mf}{1.4}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{c} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{((}\PYG{l+m+mi}{1} \PYG{o}{+} \PYG{p}{(}\PYG{n}{gamma} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{/} \PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{M}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{/} \PYG{p}{(}\PYG{n}{M} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{))}
+
+    \PYG{k}{def} \PYG{n+nf}{basic\PYGZus{}fit}\PYG{p}{(}\PYG{n}{M}\PYG{p}{,} \PYG{n}{c}\PYG{p}{,} \PYG{n}{alpha}\PYG{p}{,} \PYG{n}{beta}\PYG{p}{,} \PYG{n}{gamma}\PYG{o}{=}\PYG{l+m+mf}{1.4}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{c} \PYG{o}{*} \PYG{n}{gamma}\PYG{o}{**}\PYG{n}{alpha} \PYG{o}{*} \PYG{n}{M}\PYG{o}{**}\PYG{n}{beta}
+
+    \PYG{k}{def} \PYG{n+nf}{offset\PYGZus{}fit}\PYG{p}{(}\PYG{n}{M}\PYG{p}{,} \PYG{n}{c}\PYG{p}{,} \PYG{n}{alpha}\PYG{p}{,} \PYG{n}{beta}\PYG{p}{,} \PYG{n}{gamma}\PYG{o}{=}\PYG{l+m+mf}{1.4}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{c} \PYG{o}{*} \PYG{n}{gamma}\PYG{o}{**}\PYG{n}{alpha} \PYG{o}{*} \PYG{p}{(}\PYG{n}{M} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{**}\PYG{n}{beta}
+
+    \PYG{k}{def} \PYG{n+nf}{plot\PYGZus{}nondimensional\PYGZus{}standoff}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{):}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{(}\PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{6}\PYG{p}{))}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{scatter}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Mach Number\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}delta/D\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Non\PYGZhy{}dimensional Standoff Distance vs Mach Number\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+
+    \PYG{k}{def} \PYG{n+nf}{perform\PYGZus{}curve\PYGZus{}fits}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{):}
+        \PYG{c+c1}{\PYGZsh{} Qualitative scaling fit}
+        \PYG{n}{popt\PYGZus{}qual}\PYG{p}{,} \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{curve\PYGZus{}fit}\PYG{p}{(}\PYG{n}{qualitative\PYGZus{}scaling}\PYG{p}{,} \PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Basic fit}
+        \PYG{n}{popt\PYGZus{}basic}\PYG{p}{,} \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{curve\PYGZus{}fit}\PYG{p}{(}\PYG{n}{basic\PYGZus{}fit}\PYG{p}{,} \PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Offset fit}
+        \PYG{n}{popt\PYGZus{}offset}\PYG{p}{,} \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{curve\PYGZus{}fit}\PYG{p}{(}\PYG{n}{offset\PYGZus{}fit}\PYG{p}{,} \PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{)}
+
+        \PYG{k}{return} \PYG{n}{popt\PYGZus{}qual}\PYG{p}{,} \PYG{n}{popt\PYGZus{}basic}\PYG{p}{,} \PYG{n}{popt\PYGZus{}offset}
+
+    \PYG{k}{def} \PYG{n+nf}{plot\PYGZus{}curve\PYGZus{}fits}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{,} \PYG{n}{popt\PYGZus{}qual}\PYG{p}{,} \PYG{n}{popt\PYGZus{}basic}\PYG{p}{,} \PYG{n}{popt\PYGZus{}offset}\PYG{p}{):}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{(}\PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{12}\PYG{p}{,} \PYG{l+m+mi}{8}\PYG{p}{))}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{scatter}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Data\PYGZsq{}}\PYG{p}{)}
+
+        \PYG{n}{M\PYGZus{}fit} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{),} \PYG{n+nb}{max}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{),} \PYG{l+m+mi}{100}\PYG{p}{)}
+
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{M\PYGZus{}fit}\PYG{p}{,} \PYG{n}{qualitative\PYGZus{}scaling}\PYG{p}{(}\PYG{n}{M\PYGZus{}fit}\PYG{p}{,} \PYG{o}{*}\PYG{n}{popt\PYGZus{}qual}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}r\PYGZhy{}\PYGZsq{}}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Qualitative Scaling\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{M\PYGZus{}fit}\PYG{p}{,} \PYG{n}{basic\PYGZus{}fit}\PYG{p}{(}\PYG{n}{M\PYGZus{}fit}\PYG{p}{,} \PYG{o}{*}\PYG{n}{popt\PYGZus{}basic}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}g\PYGZhy{}\PYGZsq{}}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Basic Fit\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{M\PYGZus{}fit}\PYG{p}{,} \PYG{n}{offset\PYGZus{}fit}\PYG{p}{(}\PYG{n}{M\PYGZus{}fit}\PYG{p}{,} \PYG{o}{*}\PYG{n}{popt\PYGZus{}offset}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}b\PYGZhy{}\PYGZsq{}}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Offset Fit\PYGZsq{}}\PYG{p}{)}
+
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Mach Number\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}delta/D\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Curve Fits for Non\PYGZhy{}dimensional Standoff Distance\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{()}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+
+    \PYG{c+c1}{\PYGZsh{} ... (keep all existing code up to the standoff\PYGZus{}data dictionary)}
+
+    \PYG{c+c1}{\PYGZsh{} Replace the first instance of standoff\PYGZus{}data with this:}
+    \PYG{n}{standoff\PYGZus{}data} \PYG{o}{=} \PYG{p}{\PYGZob{}}
+        \PYG{l+m+mf}{2.25}\PYG{p}{:} \PYG{p}{[}\PYG{l+m+mf}{16.65}\PYG{p}{,} \PYG{l+m+mf}{16.82}\PYG{p}{,} \PYG{l+m+mf}{16.65}\PYG{p}{,} \PYG{l+m+mf}{2.40}\PYG{p}{,} \PYG{l+m+mf}{2.29}\PYG{p}{,} \PYG{l+m+mf}{2.44}\PYG{p}{],}
+        \PYG{l+m+mf}{1.75}\PYG{p}{:} \PYG{p}{[}\PYG{l+m+mf}{16.69}\PYG{p}{,} \PYG{l+m+mf}{16.65}\PYG{p}{,} \PYG{l+m+mf}{16.69}\PYG{p}{,} \PYG{l+m+mf}{3.95}\PYG{p}{,} \PYG{l+m+mf}{3.97}\PYG{p}{,} \PYG{l+m+mf}{4.11}\PYG{p}{],}
+        \PYG{l+m+mf}{2.0}\PYG{p}{:} \PYG{p}{[}\PYG{l+m+mf}{16.87}\PYG{p}{,} \PYG{l+m+mf}{16.51}\PYG{p}{,} \PYG{l+m+mf}{16.74}\PYG{p}{,} \PYG{l+m+mf}{2.80}\PYG{p}{,} \PYG{l+m+mf}{2.95}\PYG{p}{,} \PYG{l+m+mf}{2.98}\PYG{p}{],}
+        \PYG{l+m+mf}{2.5}\PYG{p}{:} \PYG{p}{[}\PYG{l+m+mf}{16.83}\PYG{p}{,} \PYG{l+m+mf}{16.69}\PYG{p}{,} \PYG{l+m+mf}{16.82}\PYG{p}{,} \PYG{l+m+mf}{2.02}\PYG{p}{,} \PYG{l+m+mf}{2.22}\PYG{p}{,} \PYG{l+m+mf}{2.07}\PYG{p}{],}
+        \PYG{l+m+mf}{2.75}\PYG{p}{:} \PYG{p}{[}\PYG{l+m+mf}{16.78}\PYG{p}{,} \PYG{l+m+mf}{16.78}\PYG{p}{,} \PYG{l+m+mf}{16.78}\PYG{p}{,} \PYG{l+m+mf}{2.00}\PYG{p}{,} \PYG{l+m+mf}{1.95}\PYG{p}{,} \PYG{l+m+mf}{1.93}\PYG{p}{],}
+        \PYG{l+m+mf}{3.0}\PYG{p}{:} \PYG{p}{[}\PYG{l+m+mf}{16.69}\PYG{p}{,} \PYG{l+m+mf}{16.78}\PYG{p}{,} \PYG{l+m+mf}{16.78}\PYG{p}{,} \PYG{l+m+mf}{1.71}\PYG{p}{,} \PYG{l+m+mf}{1.80}\PYG{p}{,} \PYG{l+m+mf}{1.74}\PYG{p}{]}
+    \PYG{p}{\PYGZcb{}}
+
+    \PYG{c+c1}{\PYGZsh{} Add these new functions after the existing functions}
+
+    \PYG{k}{def} \PYG{n+nf}{calculate\PYGZus{}nondimensional\PYGZus{}standoff}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{diameters}\PYG{p}{,} \PYG{n}{standoff\PYGZus{}distances}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n}{standoff\PYGZus{}distances}\PYG{p}{)} \PYG{o}{/} \PYG{n}{np}\PYG{o}{.}\PYG{n}{array}\PYG{p}{(}\PYG{n}{diameters}\PYG{p}{)}
+
+    \PYG{k}{def} \PYG{n+nf}{qualitative\PYGZus{}scaling}\PYG{p}{(}\PYG{n}{M}\PYG{p}{,} \PYG{n}{c}\PYG{p}{,} \PYG{n}{gamma}\PYG{o}{=}\PYG{l+m+mf}{1.4}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{c} \PYG{o}{*} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{((}\PYG{l+m+mi}{1} \PYG{o}{+} \PYG{p}{(}\PYG{n}{gamma} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)} \PYG{o}{/} \PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{M}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{/} \PYG{p}{(}\PYG{n}{M} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{))}
+
+    \PYG{k}{def} \PYG{n+nf}{basic\PYGZus{}fit}\PYG{p}{(}\PYG{n}{M}\PYG{p}{,} \PYG{n}{c}\PYG{p}{,} \PYG{n}{alpha}\PYG{p}{,} \PYG{n}{beta}\PYG{p}{,} \PYG{n}{gamma}\PYG{o}{=}\PYG{l+m+mf}{1.4}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{c} \PYG{o}{*} \PYG{n}{gamma}\PYG{o}{**}\PYG{n}{alpha} \PYG{o}{*} \PYG{n}{M}\PYG{o}{**}\PYG{n}{beta}
+
+    \PYG{k}{def} \PYG{n+nf}{offset\PYGZus{}fit}\PYG{p}{(}\PYG{n}{M}\PYG{p}{,} \PYG{n}{c}\PYG{p}{,} \PYG{n}{alpha}\PYG{p}{,} \PYG{n}{beta}\PYG{p}{,} \PYG{n}{gamma}\PYG{o}{=}\PYG{l+m+mf}{1.4}\PYG{p}{):}
+        \PYG{k}{return} \PYG{n}{c} \PYG{o}{*} \PYG{n}{gamma}\PYG{o}{**}\PYG{n}{alpha} \PYG{o}{*} \PYG{p}{(}\PYG{n}{M} \PYG{o}{\PYGZhy{}} \PYG{l+m+mi}{1}\PYG{p}{)}\PYG{o}{**}\PYG{n}{beta}
+
+    \PYG{k}{def} \PYG{n+nf}{plot\PYGZus{}nondimensional\PYGZus{}standoff}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{):}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{(}\PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{10}\PYG{p}{,} \PYG{l+m+mi}{6}\PYG{p}{))}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{scatter}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Mach Number\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}delta/D\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Non\PYGZhy{}dimensional Standoff Distance vs Mach Number\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+
+    \PYG{k}{def} \PYG{n+nf}{perform\PYGZus{}curve\PYGZus{}fits}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{):}
+        \PYG{c+c1}{\PYGZsh{} Qualitative scaling fit}
+        \PYG{n}{popt\PYGZus{}qual}\PYG{p}{,} \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{curve\PYGZus{}fit}\PYG{p}{(}\PYG{n}{qualitative\PYGZus{}scaling}\PYG{p}{,} \PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Basic fit}
+        \PYG{n}{popt\PYGZus{}basic}\PYG{p}{,} \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{curve\PYGZus{}fit}\PYG{p}{(}\PYG{n}{basic\PYGZus{}fit}\PYG{p}{,} \PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Offset fit}
+        \PYG{n}{popt\PYGZus{}offset}\PYG{p}{,} \PYG{n}{\PYGZus{}} \PYG{o}{=} \PYG{n}{curve\PYGZus{}fit}\PYG{p}{(}\PYG{n}{offset\PYGZus{}fit}\PYG{p}{,} \PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{)}
+
+        \PYG{k}{return} \PYG{n}{popt\PYGZus{}qual}\PYG{p}{,} \PYG{n}{popt\PYGZus{}basic}\PYG{p}{,} \PYG{n}{popt\PYGZus{}offset}
+
+    \PYG{k}{def} \PYG{n+nf}{plot\PYGZus{}curve\PYGZus{}fits}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{,} \PYG{n}{popt\PYGZus{}qual}\PYG{p}{,} \PYG{n}{popt\PYGZus{}basic}\PYG{p}{,} \PYG{n}{popt\PYGZus{}offset}\PYG{p}{):}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{figure}\PYG{p}{(}\PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{12}\PYG{p}{,} \PYG{l+m+mi}{8}\PYG{p}{))}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{scatter}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Data\PYGZsq{}}\PYG{p}{)}
+
+        \PYG{n}{M\PYGZus{}fit} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{linspace}\PYG{p}{(}\PYG{n+nb}{min}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{),} \PYG{n+nb}{max}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{),} \PYG{l+m+mi}{100}\PYG{p}{)}
+
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{M\PYGZus{}fit}\PYG{p}{,} \PYG{n}{qualitative\PYGZus{}scaling}\PYG{p}{(}\PYG{n}{M\PYGZus{}fit}\PYG{p}{,} \PYG{o}{*}\PYG{n}{popt\PYGZus{}qual}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}r\PYGZhy{}\PYGZsq{}}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Qualitative Scaling\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{M\PYGZus{}fit}\PYG{p}{,} \PYG{n}{basic\PYGZus{}fit}\PYG{p}{(}\PYG{n}{M\PYGZus{}fit}\PYG{p}{,} \PYG{o}{*}\PYG{n}{popt\PYGZus{}basic}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}g\PYGZhy{}\PYGZsq{}}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Basic Fit\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{M\PYGZus{}fit}\PYG{p}{,} \PYG{n}{offset\PYGZus{}fit}\PYG{p}{(}\PYG{n}{M\PYGZus{}fit}\PYG{p}{,} \PYG{o}{*}\PYG{n}{popt\PYGZus{}offset}\PYG{p}{),} \PYG{l+s+s1}{\PYGZsq{}b\PYGZhy{}\PYGZsq{}}\PYG{p}{,} \PYG{n}{label}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}Offset Fit\PYGZsq{}}\PYG{p}{)}
+
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{xlabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Mach Number\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{ylabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}delta/D\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{title}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Curve Fits for Non\PYGZhy{}dimensional Standoff Distance\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{legend}\PYG{p}{()}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{grid}\PYG{p}{(}\PYG{k+kc}{True}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+
+    \PYG{c+c1}{\PYGZsh{} ... (keep the rest of your existing code)}
+
+    \PYG{c+c1}{\PYGZsh{} After your existing code, add:}
+
+    \PYG{c+c1}{\PYGZsh{} Process the standoff data}
+    \PYG{n}{mach\PYGZus{}numbers} \PYG{o}{=} \PYG{n+nb}{list}\PYG{p}{(}\PYG{n}{standoff\PYGZus{}data}\PYG{o}{.}\PYG{n}{keys}\PYG{p}{())}
+    \PYG{n}{diameters} \PYG{o}{=} \PYG{p}{[[}\PYG{n}{d} \PYG{k}{for} \PYG{n}{d} \PYG{o+ow}{in} \PYG{n}{data}\PYG{p}{[:}\PYG{l+m+mi}{3}\PYG{p}{]]} \PYG{k}{for} \PYG{n}{data} \PYG{o+ow}{in} \PYG{n}{standoff\PYGZus{}data}\PYG{o}{.}\PYG{n}{values}\PYG{p}{()]}
+    \PYG{n}{standoff\PYGZus{}distances} \PYG{o}{=} \PYG{p}{[[}\PYG{n}{s} \PYG{k}{for} \PYG{n}{s} \PYG{o+ow}{in} \PYG{n}{data}\PYG{p}{[}\PYG{l+m+mi}{3}\PYG{p}{:]]} \PYG{k}{for} \PYG{n}{data} \PYG{o+ow}{in} \PYG{n}{standoff\PYGZus{}data}\PYG{o}{.}\PYG{n}{values}\PYG{p}{()]}
+
+    \PYG{c+c1}{\PYGZsh{} Calculate average values}
+    \PYG{n}{avg\PYGZus{}diameters} \PYG{o}{=} \PYG{p}{[}\PYG{n}{np}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{d}\PYG{p}{)} \PYG{k}{for} \PYG{n}{d} \PYG{o+ow}{in} \PYG{n}{diameters}\PYG{p}{]}
+    \PYG{n}{avg\PYGZus{}standoffs} \PYG{o}{=} \PYG{p}{[}\PYG{n}{np}\PYG{o}{.}\PYG{n}{mean}\PYG{p}{(}\PYG{n}{s}\PYG{p}{)} \PYG{k}{for} \PYG{n}{s} \PYG{o+ow}{in} \PYG{n}{standoff\PYGZus{}distances}\PYG{p}{]}
+
+    \PYG{c+c1}{\PYGZsh{} Calculate non\PYGZhy{}dimensional standoff}
+    \PYG{n}{nondimensional\PYGZus{}standoff} \PYG{o}{=} \PYG{n}{calculate\PYGZus{}nondimensional\PYGZus{}standoff}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{avg\PYGZus{}diameters}\PYG{p}{,} \PYG{n}{avg\PYGZus{}standoffs}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Plot non\PYGZhy{}dimensional standoff distance}
+    \PYG{n}{plot\PYGZus{}nondimensional\PYGZus{}standoff}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Perform curve fits}
+    \PYG{n}{popt\PYGZus{}qual}\PYG{p}{,} \PYG{n}{popt\PYGZus{}basic}\PYG{p}{,} \PYG{n}{popt\PYGZus{}offset} \PYG{o}{=} \PYG{n}{perform\PYGZus{}curve\PYGZus{}fits}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Plot curve fits}
+    \PYG{n}{plot\PYGZus{}curve\PYGZus{}fits}\PYG{p}{(}\PYG{n}{mach\PYGZus{}numbers}\PYG{p}{,} \PYG{n}{nondimensional\PYGZus{}standoff}\PYG{p}{,} \PYG{n}{popt\PYGZus{}qual}\PYG{p}{,} \PYG{n}{popt\PYGZus{}basic}\PYG{p}{,} \PYG{n}{popt\PYGZus{}offset}\PYG{p}{)}
+
+    \PYG{c+c1}{\PYGZsh{} Print table of fit constants}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{Fit Constants:\PYGZdq{}}\PYG{p}{)}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Qualitative Scaling: c =\PYGZdq{}}\PYG{p}{,} \PYG{n}{popt\PYGZus{}qual}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Basic Fit: c =\PYGZdq{}}\PYG{p}{,} \PYG{n}{popt\PYGZus{}basic}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{l+s+s2}{\PYGZdq{}, alpha =\PYGZdq{}}\PYG{p}{,} \PYG{n}{popt\PYGZus{}basic}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{l+s+s2}{\PYGZdq{}, beta =\PYGZdq{}}\PYG{p}{,} \PYG{n}{popt\PYGZus{}basic}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{])}
+    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Offset Fit: c =\PYGZdq{}}\PYG{p}{,} \PYG{n}{popt\PYGZus{}offset}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{l+s+s2}{\PYGZdq{}, alpha =\PYGZdq{}}\PYG{p}{,} \PYG{n}{popt\PYGZus{}offset}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{l+s+s2}{\PYGZdq{}, beta =\PYGZdq{}}\PYG{p}{,} \PYG{n}{popt\PYGZus{}offset}\PYG{p}{[}\PYG{l+m+mi}{2}\PYG{p}{])}
+\end{Verbatim}

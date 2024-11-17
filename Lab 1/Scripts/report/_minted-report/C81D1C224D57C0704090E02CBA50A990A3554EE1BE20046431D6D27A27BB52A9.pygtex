@@ -1,0 +1,55 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+    \PYG{k+kn}{import} \PYG{n+nn}{cv2}
+    \PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
+    \PYG{k+kn}{import} \PYG{n+nn}{matplotlib.pyplot} \PYG{k}{as} \PYG{n+nn}{plt}
+
+    \PYG{k}{def} \PYG{n+nf}{onclick}\PYG{p}{(}\PYG{n}{event}\PYG{p}{):}
+        \PYG{k}{global} \PYG{n}{points}
+        \PYG{k}{if} \PYG{n}{event}\PYG{o}{.}\PYG{n}{button} \PYG{o}{==} \PYG{l+m+mi}{1} \PYG{o+ow}{and} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{points}\PYG{p}{)} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{2}\PYG{p}{:}  \PYG{c+c1}{\PYGZsh{} Left mouse button}
+            \PYG{n}{points}\PYG{o}{.}\PYG{n}{append}\PYG{p}{((}\PYG{n}{event}\PYG{o}{.}\PYG{n}{xdata}\PYG{p}{,} \PYG{n}{event}\PYG{o}{.}\PYG{n}{ydata}\PYG{p}{))}
+            \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{event}\PYG{o}{.}\PYG{n}{xdata}\PYG{p}{,} \PYG{n}{event}\PYG{o}{.}\PYG{n}{ydata}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}ro\PYGZsq{}}\PYG{p}{)}
+            \PYG{n}{plt}\PYG{o}{.}\PYG{n}{draw}\PYG{p}{()}
+            \PYG{k}{if} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{points}\PYG{p}{)} \PYG{o}{==} \PYG{l+m+mi}{2}\PYG{p}{:}
+                \PYG{n}{plt}\PYG{o}{.}\PYG{n}{close}\PYG{p}{()}
+
+    \PYG{k}{def} \PYG{n+nf}{calculate\PYGZus{}calibration\PYGZus{}factor}\PYG{p}{(}\PYG{n}{image\PYGZus{}path}\PYG{p}{,} \PYG{n}{grid\PYGZus{}spacing\PYGZus{}mm}\PYG{o}{=}\PYG{l+m+mi}{5}\PYG{p}{):}
+        \PYG{k}{global} \PYG{n}{points}
+        \PYG{n}{points} \PYG{o}{=} \PYG{p}{[]}
+
+        \PYG{c+c1}{\PYGZsh{} Read the image}
+        \PYG{n}{img} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{imread}\PYG{p}{(}\PYG{n}{image\PYGZus{}path}\PYG{p}{)}
+        \PYG{n}{img\PYGZus{}rgb} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{cvtColor}\PYG{p}{(}\PYG{n}{img}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{COLOR\PYGZus{}BGR2RGB}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Display the image and wait for point selection}
+        \PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{()}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{imshow}\PYG{p}{(}\PYG{n}{img\PYGZus{}rgb}\PYG{p}{)}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Click on two points 10 grid spaces apart\PYGZdq{}}\PYG{p}{)}
+        \PYG{n}{fig}\PYG{o}{.}\PYG{n}{canvas}\PYG{o}{.}\PYG{n}{mpl\PYGZus{}connect}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}button\PYGZus{}press\PYGZus{}event\PYGZsq{}}\PYG{p}{,} \PYG{n}{onclick}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+
+        \PYG{k}{if} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{points}\PYG{p}{)} \PYG{o}{!=} \PYG{l+m+mi}{2}\PYG{p}{:}
+            \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Error: Two points were not selected.\PYGZdq{}}\PYG{p}{)}
+            \PYG{k}{return} \PYG{k+kc}{None}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate distance between selected points}
+        \PYG{n}{distance\PYGZus{}px} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{((}\PYG{n}{points}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{][}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{points}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{][}\PYG{l+m+mi}{0}\PYG{p}{])}\PYG{o}{**}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{p}{(}\PYG{n}{points}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{][}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{points}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{][}\PYG{l+m+mi}{1}\PYG{p}{])}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate calibration factor (pixels per mm)}
+        \PYG{n}{calibration\PYGZus{}factor} \PYG{o}{=} \PYG{n}{distance\PYGZus{}px} \PYG{o}{/} \PYG{p}{(}\PYG{l+m+mi}{10} \PYG{o}{*} \PYG{n}{grid\PYGZus{}spacing\PYGZus{}mm}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Visualize the selected points}
+        \PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{()}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{imshow}\PYG{p}{(}\PYG{n}{img\PYGZus{}rgb}\PYG{p}{)}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{([}\PYG{n}{points}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{][}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{points}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{][}\PYG{l+m+mi}{0}\PYG{p}{]],} \PYG{p}{[}\PYG{n}{points}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{][}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{points}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{][}\PYG{l+m+mi}{1}\PYG{p}{]],} \PYG{l+s+s1}{\PYGZsq{}r\PYGZhy{}\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{([}\PYG{n}{p}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{k}{for} \PYG{n}{p} \PYG{o+ow}{in} \PYG{n}{points}\PYG{p}{],} \PYG{p}{[}\PYG{n}{p}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{k}{for} \PYG{n}{p} \PYG{o+ow}{in} \PYG{n}{points}\PYG{p}{],} \PYG{l+s+s1}{\PYGZsq{}ro\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}title}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Calibration: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{calibration\PYGZus{}factor}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ pixels/mm\PYGZdq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+
+        \PYG{k}{return} \PYG{n}{calibration\PYGZus{}factor}
+
+    \PYG{c+c1}{\PYGZsh{} Usage}
+    \PYG{n}{calibration\PYGZus{}image\PYGZus{}path} \PYG{o}{=} \PYG{l+s+s2}{\PYGZdq{}Lab 1\PYGZbs{}Data\PYGZbs{}Images\PYGZbs{}Wind\PYGZus{}off\PYGZus{}calibrate.bmp\PYGZdq{}}
+    \PYG{n}{cal\PYGZus{}factor} \PYG{o}{=} \PYG{n}{calculate\PYGZus{}calibration\PYGZus{}factor}\PYG{p}{(}\PYG{n}{calibration\PYGZus{}image\PYGZus{}path}\PYG{p}{)}
+    \PYG{k}{if} \PYG{n}{cal\PYGZus{}factor}\PYG{p}{:}
+        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Calibration factor: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{cal\PYGZus{}factor}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ pixels/mm\PYGZdq{}}\PYG{p}{)}
+\end{Verbatim}

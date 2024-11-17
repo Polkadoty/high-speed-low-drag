@@ -1,0 +1,501 @@
+\documentclass{article}
+
+%package setup
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{fancyhdr}
+\usepackage[margin=1in]{geometry}
+\usepackage{comment}
+\usepackage{placeins}
+\usepackage{parskip}
+\usepackage{subcaption}
+\usepackage{appendix}
+\usepackage{soul}
+\usepackage{comment}
+\PassOptionsToPackage{hyphens}{url}\usepackage[hidelinks]{hyperref}
+\usepackage{matlab-prettifier}
+\usepackage{minted}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{textcomp, gensymb}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usetikzlibrary{arrows.meta, positioning, decorations.pathmorphing}
+\usepackage{caption}
+
+\pagestyle{fancy}
+\fancyhf{} % Clear header/footer settings
+\rhead{\thepage} % Page number on the right in the header
+\lhead{ASE162M Report 1} % Your report title on the left
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \includegraphics[width=10cm]{ase-logo-formal.png}  % Adjust the width as needed
+  \vspace{1cm}  % Add some vertical space
+ 
+  \Large \textbf{ASE 162M High-Speed Aerodynamics}\\
+  \large \textbf{Section 14275}\\
+  \vspace{0.5cm}
+  \textbf{Tuesday: 4:00 - 6:00 pm}\\
+ 
+  \vspace{1cm}
+ 
+  \hrule
+  \vspace{0.5cm}
+ 
+  \begin{center}
+  \Huge \textbf{Supersonic Flow over a Wedge and Cone}\\
+  \end{center}
+ 
+  \vspace{0.5cm}
+  \hrule
+ 
+  \vspace{1cm}  
+ 
+  \normalsize \textbf{Andrew Doty}\\
+  \normalsize \textbf{Due Date: October 29, 2024}
+ 
+\end{titlepage}
+\newpage
+
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+
+\section{Introduction}
+This experiment examines supersonic flow over wedges and cones, key configurations in compressible aerodynamics. These geometries generate distinct shock wave patterns: an oblique shock for the wedge and a conical shock for the cone. The angles and surface pressures of these shock waves are critical for understanding the differences between two-dimensional and three-dimensional supersonic flows. 
+
+The objectives are to:
+\begin{enumerate}
+\item Visualize and compare flow fields and shock structures around wedge and cone geometries using Schlieren imaging.
+\item Measure and analyze shock wave angles and surface pressures at various Mach numbers.
+\item Compare experimental results with theoretical predictions from oblique shock theory and Taylor-Maccoll solutions.
+\item Investigate the three-dimensional relieving effect by contrasting wedge and cone flows under identical conditions.
+\end{enumerate}
+
+This report details the experimental methodology, data analysis, and results, focusing on the differences between two-dimensional and axisymmetric supersonic flows. The findings enhance the understanding of compressible flow phenomena and provide validation data for theoretical models and computational fluid dynamics (CFD) simulations in aerospace applications.
+
+\section{Experimental Setup}
+
+The experiment was conducted using the Aerolab Variable Mach Number Wind Tunnel, capable of producing supersonic flows with Mach numbers ranging from approximately 2.25 to 3. The test section of the wind tunnel is nominally 3" * 3". A $10^\circ$ wedge and $9.5^\circ$ cone model were mounted in the test section at a 0° angle of attack.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ASE162M_Lab2Image.png}
+    \caption{Experimental setup for Lab 2: Supersonic Flow over a Wedge and Cone.}
+    \label{fig:lab2_setup}
+\end{figure}
+
+
+\begin{table}[H]
+    \centering
+    \caption{Schlieren System Components and Functions}
+    \renewcommand{\arraystretch}{1.5} % Adjust row height
+    \begin{tabularx}{\textwidth}{|p{3.5cm}|X|} % Use X for flexible width
+    \hline
+    \textbf{Component} & \textbf{Function} \\
+    \hline
+    Pulsed Light Source & Provides high-intensity, short-duration illumination for capturing instantaneous flow features. \\
+    \hline
+    Pin hole & Acts as a spatial filter to create a point source of light, improving image quality by reducing diffuse light. \\
+    \hline
+    Color filter & Optional component that can be used to produce color Schlieren images or filter specific wavelengths. \\
+    \hline
+    Concave Mirror 1 & Collimates the light beam from the point source into parallel rays that pass through the test section. \\
+    \hline
+    Dummy mirror & Redirects the light path to create a folded system, reducing the overall space requirements. \\
+    \hline
+    Test Section & Contains the flow and model being studied, where density gradients cause light ray deflection. \\
+    \hline
+    Concave Mirror 2 & Focuses the parallel light rays after they pass through the test section. \\
+    \hline
+    Knife Edge & Blocks a portion of the refracted light rays to create contrast in the final image based on density gradients. \\
+    \hline
+    Camera & Records the resulting Schlieren image showing flow features. \\
+    \hline
+    PT (Pressure Transducer) & Measures pressure at various points in the flow field. \\
+    \hline
+    DAQ (Data Acquisition) & Collects and digitizes pressure measurements from the transducers. \\
+    \hline
+    PC & Controls data acquisition and image capture, stores experimental data. \\
+    \hline
+    \end{tabularx}
+    \label{tab:schlieren_components}
+\end{table}
+
+
+
+\subsection{Calibration and Imaging}
+
+Prior to running the experiments, a calibration process was performed:
+
+\begin{itemize}
+    \item A 30/30, 5mm grid points calibration sheet was used for spatial calibration.
+    \item 10 grid spaces, equivalent to 50mm, were used to determine the pixel-to-length ratio and associated uncertainty.
+    \item Measurements were taken both vertically and horizontally and compared to find the distortion ratio.
+    \item A blank image without the calibration sheet was taken, followed by an image with the calibration sheet in place.
+\end{itemize}
+
+Flow visualization was achieved using both shadowgraph and Schlieren imaging techniques. A folded Schlieren system utilizing a pulsed xenon arc lamp as the light source was employed. For each Mach number, three types of images were captured:
+
+\begin{enumerate}
+    \item Shadowgraph
+    \item Vertical Schlieren
+    \item Horizontal Schlieren
+\end{enumerate}
+
+For the Schlieren setup, a knife edge was placed at the focal point to enhance the visualization of density gradients. The vertical and horizontal indicate the orientation of the blade. 
+
+\subsection{Data Acquisition}
+
+Pressure measurements were recorded using a LabVIEW-based data acquisition system with three pressure transducers:
+
+\begin{itemize}
+    \item Channel 0: Stagnation pressure (P\textsubscript{0})
+    \item Channel 1: Freestream static pressure
+    \item Channel 2: Pressure along the surface of the wedge or cone
+\end{itemize}
+
+The pressure data was recorded in volts (gauge pressure) and later converted to appropriate units using calibration constants 15psi/0.1V and 60psi/0.1V.
+
+\subsection{Experimental Procedure}
+
+The experiment followed these steps for each run:
+
+\begin{enumerate}
+    \item The wind tunnel was started in the sequence: power, hydraulic, then run.
+    \item The initial Mach number was set to approximately 3, with subsequent runs decreasing by increments of 0.25.
+    \item Once the LabVIEW system showed stable pressure readings, images were captured using the Pulnix color CCD camera and XCAP for Windows acquisition software.
+    \item The wind tunnel was operated only while the run button was held, and shut down in the reverse order of startup once the airflow stopped.
+    \item Mach number was adjusted by changing the area ratio and chamber pressure according to the manufacturer's specifications, referencing the "Approximate Minimum Stagnation Pressure vs Mach Number" chart.
+\end{enumerate}
+
+Care was taken to monitor the pressure of the compressed air tank to ensure consistent flow quality across all runs. The experiment was repeated for Mach numbers of 3, 2.75, and 2.25.
+
+\section{Data Processing}
+
+\subsection{Calibration}
+
+Using an OpenCV-based script, the calibration constants were found to be 14.23 and 14.45 for the vertical and horizontal calibration factors, respectively, with a distortion ratio of 0.985. This shows that the image is stretched in the horizontal direction and the distortion ratio will be the correction factor.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{calibration.png}
+    \caption{Calibration constants and distortion ratio}
+    \label{fig:calibration}
+\end{figure}
+
+This distortion ratio was used to correct the Schlieren images. Comparing this distortion ratio image correction to the actual size of the cone and wedge, we can see that the distortion ratio is very close to 1, indicating that the distortion of the cone and wedge through the camera is minimal.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Un-distorted-Image.png}
+        \caption{Undistorted Image}
+        \label{fig:undistorted_image}
+    \end{minipage}\hfill
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Distorted-Image.png}
+        \caption{Distorted Image}
+        \label{fig:distorted_image}
+    \end{minipage}
+\end{figure}
+
+These images look very similar. The undistorted image shows some more aliasing artifacts as the pixels were shifted to correct for the distortion, but otherwise the images look very similar.
+
+\section{Results and Discussion}
+
+\subsection{Flow Visualization}
+
+Showing the wedge and cone at the same Mach Number, 2.75, using the best image to show the flow features.
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Cone_275.png}
+        \caption{Mach 2.75 - Cone}
+        \label{fig:cone275}
+    \end{minipage}\hfill
+    \begin{minipage}{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Wedge_275.png}
+        \caption{Mach 2.75 - Wedge}
+        \label{fig:wedge275}
+    \end{minipage}
+\end{figure}
+
+Similarities:
+    \begin{enumerate}
+        \item Both show clear oblique shock waves and boundary layer development.
+        \item Both exhibit turbulent wakes, expansion waves, recirculation regions, and Mach waves in the freestream.
+    \end{enumerate}
+
+
+Key Differences:
+    \begin{enumerate}
+        \item Shock Wave Intensity: Wedge shock is sharper; cone shock is more diffuse.
+        \item Expansion Fan: Wedge has a distinct fan; cone has a gradual expansion.
+        \item Wake Structure: Wedge wake is uniform; cone wake is complex with recompression shocks.
+        \item Boundary Layer: Wedge layer is uniform; cone layer varies due to three-dimensional flow.
+        \item Flow Structure: Wedge flow is two-dimensional; cone flow integrates features, leading to gradual transitions.
+    \end{enumerate}
+
+These differences are mostly down to the size of the two objects, with the cone being larger and having a more three-dimensional effect than the wedge. By contrast, the wedge is a two-dimensional object and therefore visually the shockwaves are more distinct as they stack directly on top of each other.
+
+\subsection{Schlieren Analysis}
+
+Using an openCV script, I plotted the density profiles of the wedge and cone at all mach numbers for the A and B positions. In this case, you can see a single image here for the Cone and Wedge at Mach 2.25:
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Cone-225-Density.png}
+        \caption{Density Profile - Cone}
+        \label{fig:cone_density_profiles}
+    \end{minipage}\vfill
+    \begin{minipage}{0.8\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Wedge-225-Density.png}
+        \caption{Density Profile - Wedge}
+        \label{fig:wedge_density_profiles}
+    \end{minipage}
+\end{figure}
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{Density-Profiles.png}
+    \caption{Density Profiles}
+    \label{fig:density_profiles}
+\end{figure}
+
+Taking the cone density profile from \ref{fig:cone_density_profiles}, we can see that the density profile can be analyzed as the following:
+
+
+\begin{enumerate}
+    \item Line A Profile (Upstream of Cone):
+    \begin{enumerate}
+        \item The profile shows a uniform density (intensity ~0.5-0.6) in the freestream.
+        \item A sharp change in density occurs around y=400-500 pixels, indicating the shock wave location.
+        \item The dip to lower intensity (0.1-0.2) reflects a strong density gradient across the shock.
+        \item This aligns with ray tracing expectations:
+        \begin{enumerate}
+            \item Normal (N) intensity in freestream
+            \item Dark (D) region at shock location
+            \item Return to Normal (N) after shock
+        \end{enumerate}
+    \end{enumerate}
+
+    \item Line B Profile (Downstream of Cone):
+    \begin{enumerate}
+        \item Shows more gradual density variations compared to Line A.
+        \item Displays multiple density gradients, indicating:
+        \begin{enumerate}
+            \item Flow expansion around the cone (gradual intensity increase)
+            \item Boundary layer effects near the surface
+            \item Wake region effects
+        \end{enumerate}
+        \item The pattern follows expected ray tracing behavior:
+        \begin{enumerate}
+            \item Normal (N) in freestream
+            \item Light (L) regions where density decreases
+            \item Dark (D) regions where density increases
+            \item Multiple transitions between N/L/D due to complex flow structure
+        \end{enumerate}
+    \end{enumerate}
+
+    \item Comparison with Ray Tracing Theory:
+    \begin{enumerate}
+        \item The density distributions match expected Schlieren patterns:
+        \begin{enumerate}
+            \item Sharp transitions at shock waves
+            \item Gradual transitions in expansion regions
+            \item Multiple density gradients in the flow field
+        \end{enumerate}
+        \item The horizontal knife edge configuration highlights vertical density gradients.
+        \item The intensity variations (N→D→L→N) align with predictions for light ray deflection by density gradients.
+    \end{enumerate}
+\end{enumerate}
+
+This makes sense when using the ray tracing theory, as the density profile should show a sharp transition at the shock wave, and then a gradual transition in the expansion fan.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Raytracing.png}
+    \caption{Ray tracing diagram illustrating the expected density variations in the flow field.}
+    \label{fig:ray_tracing}
+\end{figure}
+
+\subsection{Flow Conditions}
+
+The true Mach numbers were calculated from the measured static ($P_1$) and stagnation ($P_0$) pressures using the isentropic flow relation:
+\begin{equation}
+M = \sqrt{\frac{2}{\gamma-1}\left[\left(\frac{P_0}{P_1}\right)^{\frac{\gamma-1}{\gamma}} - 1\right]}
+\end{equation}
+where $\gamma = 1.4$ for air. Data was processed using a 5\% window of stagnation pressure variation to ensure steady-state conditions. Table \ref{tab:flow_conditions} presents the measured flow conditions and calculated parameters for all experimental runs.
+\begin{table}[H]
+\centering
+\begin{tabular}{rrrrrrr}
+\toprule
+$M$ & $M_{calc}$ & $P_0$ (psi) & $P_1$ (psi) & $P_2$ (psi) & $\frac{P_2}{P_1}$ & $Re_D$ \\
+\midrule
+2.25 & $2.360 \pm 0.005$ & $37.880 \pm 0.100$ & $2.760 \pm 0.050$ & $3.920 \pm 0.080$ & $1.423 \pm 0.002$ & $91137 \pm 1500$ \\
+2.75 & $2.772 \pm 0.005$ & $79.460 \pm 0.150$ & $3.050 \pm 0.060$ & $4.250 \pm 0.090$ & $1.391 \pm 0.002$ & $94057 \pm 1600$ \\
+3.00 & $2.957 \pm 0.005$ & $92.620 \pm 0.120$ & $2.690 \pm 0.040$ & $3.990 \pm 0.070$ & $1.484 \pm 0.002$ & $86119 \pm 1400$ \\
+\bottomrule
+\end{tabular}
+\caption{Flow Conditions and Calculated Parameters}
+\label{tab:flow_conditions}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{cccc}
+\toprule
+$M$ & $M_{nominal}$ & $M_{calc}$ & Difference (\%) \\
+\midrule
+2.25 & 2.25 & $2.360 \pm 0.005$ & 4.89 \\
+2.75 & 2.75 & $2.772 \pm 0.005$ & 0.80 \\
+3.00 & 3.00 & $2.957 \pm 0.005$ & -1.43 \\
+\bottomrule
+\end{tabular}
+\caption{Comparison of Nominal and Calculated Mach Numbers}
+\label{tab:mach_comparison}
+\end{table}
+The uncertainty analysis incorporated several sources of error:
+\begin{itemize}
+\item Pressure transducer calibration uncertainty: \(\pm 0.1\%\) full scale
+\item Data acquisition system resolution: \(\pm 0.05\%\) of reading
+\item Statistical uncertainty from multiple measurements
+\item Propagation of uncertainties through Mach number calculation
+\end{itemize}
+The nominal and calculated Mach numbers (Table \ref{tab:mach_comparison}) differ by 0.80\% to 4.89\%, with the largest discrepancy at the lowest setting (M = 2.25). These differences exceed our uncertainties, indicating potential systematic deviations in wind tunnel calibration at lower Mach numbers. Nevertheless, the calculated Mach numbers offer more accurate flow conditions for further analysis, as they are based on actual pressure measurements.
+
+\subsection{Wedge Flow Analysis}
+\subsubsection{Theoretical Surface Pressure Analysis}
+
+For a 10 degree wedge, the theoretical surface pressure ratio can be calculated using oblique shock relations. First, the shock angle beta is determined from the theta-beta-M relation:
+\begin{equation}
+\tan\theta = 2\cot\beta\frac{M_1^2\sin^2\beta - 1}{M_1^2(\gamma + \cos2\beta) + 2}
+\end{equation}
+Then, the pressure ratio across the shock is calculated using:
+\begin{equation}
+\frac{p_2}{p_1} = 1 + \frac{2\gamma}{gamma+1}(M_1^2\sin^2\beta - 1)
+\end{equation}
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+$M_{calc}$ & $\beta_{theory}$ (°) & $\frac{p_2}{p_1}{theory}$ & $\frac{p_2}{p_1}{exp}$ & Difference (\%) \\
+\midrule
+$2.334 \pm 0.005$ & $33.891 \pm 0.015$ & $1.810 \pm 0.008$ & $1.841 \pm 0.003$ & $1.72 \pm 0.47$ \\
+$2.759 \pm 0.005$ & $29.273 \pm 0.015$ & $1.957 \pm 0.008$ & $2.028 \pm 0.003$ & $3.63 \pm 0.44$ \\
+$2.958 \pm 0.005$ & $27.696 \pm 0.015$ & $2.039 \pm 0.008$ & $1.652 \pm 0.003$ & $-18.96 \pm 0.42$ \\
+\bottomrule
+\end{tabular}
+\caption{Theoretical and Experimental Pressure Ratios}
+\label{tab:pressure_comparison}
+\end{table}
+
+
+\subsubsection{Wave Angle Measurements}
+The shock wave angles were measured from the Schlieren images using a three-point method:
+\begin{itemize}
+\item Point 1: Upstream on shock wave
+\item Point 2: Shock-body intersection point
+\item Point 3: Point along wedge surface
+\end{itemize}
+Images were corrected for distortion using the calibration grid method described in Section 2. The measured angles were compared with theoretical predictions:
+\begin{table}[H]
+\centering
+\begin{tabular}{lcccc}
+\toprule
+$M_{calc}$ & $\beta_{meas}$ (°) & $\beta_{theory}$ (°) & Difference (°) & \% Difference \\
+\midrule
+$2.334 \pm 0.005$ & $34.305 \pm 0.230$ & $33.891 \pm 0.015$ & $0.415 \pm 0.231$ & $1.22 \pm 0.68$ \\
+$2.759 \pm 0.005$ & $28.269 \pm 0.230$ & $29.273 \pm 0.015$ & $-1.004 \pm 0.231$ & $-3.43 \pm 0.79$ \\
+$2.958 \pm 0.005$ & $26.305 \pm 0.230$ & $27.696 \pm 0.015$ & $-1.391 \pm 0.231$ & $-5.02 \pm 0.83$ \\
+\bottomrule
+\end{tabular}
+\caption{Wave Angle Comparison}
+\label{tab:wave_angle_comparison}
+\end{table}
+
+In this case, the measured wave and surface deflection angles are within 1.5 degrees of the theoretical values, with the largest discrepancy at the highest Mach number. In the actual charts, the values in theory are around 6 degrees lower than the measured values at each mach number. This is likely due to the fact that the shock wave is not perfectly attached to the cone and the discrepancies from image distortion and the three-dimensional nature of the flow. In addition, although the shock wave is visible in the schlieren images, it is not perfectly sharp and therefore the shock angle is not as distinct. The percent difference and estimated errors are in the table above, with the largest error being 5.02\% at M = 2.958. Comparing the measured wave angle to the naca 1135 Mach 3 wave angle, there is a 6.5 degree difference at M = 2.958, leading to a percent error of 22.1\%. Likewise for Mach 2.75, there is a 6.2 degree difference, leading to a percent error of 21.0\%, and for Mach 2.334, there is a 5.5 degree difference, leading to a percent error of 23.6\%. The wedge being a 2D object had a more distinct shock wave and therefore the shock angle was more distinct, leading to lesser error.
+
+\subsubsection{Surface Pressure Analysis Using Measured Angles}
+Using the measured shock angles, we recalculated the theoretical pressure ratios:
+\begin{table}[H]
+\centering
+\begin{tabular}{lccccc}
+\toprule
+$M_{calc}$ & $\frac{p_2}{p_1}{meas}$ & $\frac{p_2}{p_1}{theory}$ & $\frac{p_2}{p_1}_{exp}$ & Theory Diff (\%) & Exp Diff (\%) \\
+\midrule
+$2.334 \pm 0.005$ & $1.825 \pm 0.009$ & $1.810 \pm 0.008$ & $1.841 \pm 0.003$ & $0.83 \pm 0.66$ & $-0.87 \pm 0.49$ \\
+$2.759 \pm 0.005$ & $1.934 \pm 0.009$ & $1.957 \pm 0.008$ & $2.028 \pm 0.003$ & $-1.17 \pm 0.61$ & $-4.63 \pm 0.45$ \\
+$2.958 \pm 0.005$ & $1.989 \pm 0.009$ & $2.039 \pm 0.008$ & $1.652 \pm 0.003$ & $-2.45 \pm 0.59$ & $20.40 \pm 0.55$ \\
+\bottomrule
+\end{tabular}
+\caption{Surface Pressure Comparison Using Measured Angles}
+\label{tab:pressure_comparison_measured}
+\end{table}
+The results show generally good agreement between theory (both calculated and the NACA 1135 chart) and experiment for lower Mach numbers, with differences within experimental uncertainty. However, at M = 2.958, I observe a significant discrepancy in the pressure ratio (-18.96\% difference), which exceeds our estimated measurement uncertainty of ±0.42\%. This larger deviation at higher Mach numbers may be attributed to:
+\begin{itemize}
+\item Boundary layer effects becoming more significant
+\item Possible flow separation at higher Mach numbers
+\item Increased viscous interactions affecting the effective wedge angle
+\item Measurement uncertainties in shock angle determination
+\end{itemize}
+The pressure ratios calculated using measured shock angles show better agreement with theory than with experimental measurements, suggesting that the flow field structure is behaving as predicted, but other factors may be affecting the surface pressure measurements at higher Mach numbers.
+
+
+\subsection{Comparative Analysis of Wedge and Cone Flows}
+
+Several key differences between wedge and cone flows are evident, aligning with theoretical predictions from oblique shock and conical flow theory:
+
+\begin{enumerate}
+    \item \textbf{Shock Wave Angles}
+    \begin{itemize}
+        \item The cone exhibits smaller shock angles compared to the wedge at the same Mach number.
+        \item At M = 2.75: cone $\beta = 21.66^\circ$ vs wedge $\beta = 28.27^\circ$.
+        \item This difference is due to the three-dimensional relieving effect in conical flow.
+        \item Theory predicts cone shock angles to be approximately 75-80\% of equivalent wedge angles.
+    \end{itemize}
+
+    \item \textbf{Surface Pressure Ratios}
+    \begin{itemize}
+        \item Lower pressure ratios are observed for cone flow.
+        \item At M = 2.75: cone $\frac{p_2}{p_1} = 1.391$ vs wedge $\frac{p_2}{p_1} = 2.028$.
+        \item Approximately 30\% lower pressures on the cone surface.
+        \item Consistent with Taylor-Maccoll theory predictions for conical flows.
+    \end{itemize}
+
+    \item \textbf{Flow Structure}
+    \begin{itemize}
+        \item Wedge flow shows distinct two-dimensional characteristics: sharp, well-defined shock wave and uniform post-shock flow field.
+        \item Cone flow exhibits three-dimensional features: more diffuse shock structure, gradual pressure variations in the post-shock region, and visible crossflow effects.
+    \end{itemize}
+
+    \item \textbf{Physical Mechanisms}
+    \begin{itemize}
+        \item Three-dimensional relieving effect allows flow to expand around the cone surface, reducing effective flow turning angle and resulting in weaker shock strength.
+        \item Streamline divergence in conical flow allows radial expansion, creating additional pressure relief not present in two-dimensional wedge flow.
+    \end{itemize}
+\end{enumerate}
+
+
+
+\section{Conclusion}
+
+This experimental investigation of supersonic flow over wedge and cone geometries demonstrated key differences between two-dimensional and axisymmetric flows. Schlieren imaging successfully captured distinct shock patterns, with the wedge producing sharp oblique shocks while the cone exhibited more diffuse conical shock waves. Quantitative analysis showed measured Mach numbers deviated from nominal values by up to 4.89\%, with wave angles matching theoretical predictions within 5.02\%. The three-dimensional relieving effect was clearly observed, with cone shock angles approximately 75-80\% of equivalent wedge angles and surface pressures about 30\% lower than the wedge at comparable conditions. While good agreement with theory was found at lower Mach numbers, significant deviations $(\approx 19\%)$ occurred at M = 2.958, likely due to increased viscous interactions. These results validate fundamental compressible flow theories while providing valuable experimental data for computational model validation. The findings highlight the substantial impact of three-dimensional effects in supersonic aerodynamics and their importance for aerospace vehicle design.
+
+\end{document}

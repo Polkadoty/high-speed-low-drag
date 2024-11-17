@@ -1,0 +1,138 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+    \PYG{k+kn}{import} \PYG{n+nn}{os}
+    \PYG{k+kn}{import} \PYG{n+nn}{cv2}
+    \PYG{k+kn}{import} \PYG{n+nn}{numpy} \PYG{k}{as} \PYG{n+nn}{np}
+    \PYG{k+kn}{import} \PYG{n+nn}{matplotlib.pyplot} \PYG{k}{as} \PYG{n+nn}{plt}
+    \PYG{k+kn}{import} \PYG{n+nn}{re}
+    \PYG{k+kn}{import} \PYG{n+nn}{argparse}  \PYG{c+c1}{\PYGZsh{} Add this import}
+
+    \PYG{k}{def} \PYG{n+nf}{onclick}\PYG{p}{(}\PYG{n}{event}\PYG{p}{):}
+        \PYG{k}{global} \PYG{n}{points}
+        \PYG{k}{if} \PYG{n}{event}\PYG{o}{.}\PYG{n}{button} \PYG{o}{==} \PYG{l+m+mi}{1} \PYG{o+ow}{and} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{points}\PYG{p}{)} \PYG{o}{\PYGZlt{}} \PYG{l+m+mi}{3}\PYG{p}{:}  \PYG{c+c1}{\PYGZsh{} Left mouse button}
+            \PYG{n}{points}\PYG{o}{.}\PYG{n}{append}\PYG{p}{((}\PYG{n}{event}\PYG{o}{.}\PYG{n}{xdata}\PYG{p}{,} \PYG{n}{event}\PYG{o}{.}\PYG{n}{ydata}\PYG{p}{))}
+            \PYG{n}{plt}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{event}\PYG{o}{.}\PYG{n}{xdata}\PYG{p}{,} \PYG{n}{event}\PYG{o}{.}\PYG{n}{ydata}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}ro\PYGZsq{}}\PYG{p}{)}
+            \PYG{n}{plt}\PYG{o}{.}\PYG{n}{draw}\PYG{p}{()}
+            \PYG{k}{if} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{points}\PYG{p}{)} \PYG{o}{==} \PYG{l+m+mi}{3}\PYG{p}{:}
+                \PYG{n}{plt}\PYG{o}{.}\PYG{n}{close}\PYG{p}{()}
+
+    \PYG{k}{def} \PYG{n+nf}{find\PYGZus{}sphere\PYGZus{}center\PYGZus{}and\PYGZus{}radius}\PYG{p}{(}\PYG{n}{top}\PYG{p}{,} \PYG{n}{bottom}\PYG{p}{):}
+        \PYG{n}{center\PYGZus{}x} \PYG{o}{=} \PYG{p}{(}\PYG{n}{top}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{+} \PYG{n}{bottom}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])} \PYG{o}{/} \PYG{l+m+mi}{2}
+        \PYG{n}{center\PYGZus{}y} \PYG{o}{=} \PYG{p}{(}\PYG{n}{top}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{+} \PYG{n}{bottom}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{])} \PYG{o}{/} \PYG{l+m+mi}{2}
+        \PYG{n}{radius} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{((}\PYG{n}{top}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{bottom}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}\PYG{o}{**}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{p}{(}\PYG{n}{top}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{bottom}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{])}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)} \PYG{o}{/} \PYG{l+m+mi}{2}
+        \PYG{k}{return} \PYG{p}{(}\PYG{n}{center\PYGZus{}x}\PYG{p}{,} \PYG{n}{center\PYGZus{}y}\PYG{p}{),} \PYG{n}{radius}
+
+    \PYG{k}{def} \PYG{n+nf}{closest\PYGZus{}point\PYGZus{}on\PYGZus{}circle}\PYG{p}{(}\PYG{n}{center}\PYG{p}{,} \PYG{n}{radius}\PYG{p}{,} \PYG{n}{point}\PYG{p}{):}
+        \PYG{n}{dx} \PYG{o}{=} \PYG{n}{point}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{center}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+        \PYG{n}{dy} \PYG{o}{=} \PYG{n}{point}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{center}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]}
+        \PYG{n}{distance} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{(}\PYG{n}{dx}\PYG{o}{**}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{n}{dy}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+        \PYG{k}{return} \PYG{p}{(}
+            \PYG{n}{center}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{+} \PYG{n}{radius} \PYG{o}{*} \PYG{n}{dx} \PYG{o}{/} \PYG{n}{distance}\PYG{p}{,}
+            \PYG{n}{center}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{+} \PYG{n}{radius} \PYG{o}{*} \PYG{n}{dy} \PYG{o}{/} \PYG{n}{distance}
+        \PYG{p}{)}
+
+    \PYG{k}{def} \PYG{n+nf}{measure\PYGZus{}shock\PYGZus{}standoff}\PYG{p}{(}\PYG{n}{image\PYGZus{}path}\PYG{p}{,} \PYG{n}{calibration\PYGZus{}factor}\PYG{p}{):}
+        \PYG{k}{global} \PYG{n}{points}
+        \PYG{n}{points} \PYG{o}{=} \PYG{p}{[]}
+
+        \PYG{c+c1}{\PYGZsh{} Read the image}
+        \PYG{n}{img} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{imread}\PYG{p}{(}\PYG{n}{image\PYGZus{}path}\PYG{p}{)}
+        \PYG{n}{img\PYGZus{}rgb} \PYG{o}{=} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{cvtColor}\PYG{p}{(}\PYG{n}{img}\PYG{p}{,} \PYG{n}{cv2}\PYG{o}{.}\PYG{n}{COLOR\PYGZus{}BGR2RGB}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Display the image and wait for point selection}
+        \PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{(}\PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{12}\PYG{p}{,} \PYG{l+m+mi}{8}\PYG{p}{))}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{imshow}\PYG{p}{(}\PYG{n}{img\PYGZus{}rgb}\PYG{p}{)}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}title}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Click to select: 1) Sphere top, 2) Sphere bottom, 3) Shock wave point\PYGZdq{}}\PYG{p}{)}
+        \PYG{n}{fig}\PYG{o}{.}\PYG{n}{canvas}\PYG{o}{.}\PYG{n}{mpl\PYGZus{}connect}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}button\PYGZus{}press\PYGZus{}event\PYGZsq{}}\PYG{p}{,} \PYG{n}{onclick}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+
+        \PYG{k}{if} \PYG{n+nb}{len}\PYG{p}{(}\PYG{n}{points}\PYG{p}{)} \PYG{o}{!=} \PYG{l+m+mi}{3}\PYG{p}{:}
+            \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}Error: Three points were not selected.\PYGZdq{}}\PYG{p}{)}
+            \PYG{k}{return} \PYG{k+kc}{None}
+
+        \PYG{c+c1}{\PYGZsh{} Find sphere center and radius}
+        \PYG{n}{top}\PYG{p}{,} \PYG{n}{bottom}\PYG{p}{,} \PYG{n}{shock} \PYG{o}{=} \PYG{n}{points}
+        \PYG{n}{center}\PYG{p}{,} \PYG{n}{radius} \PYG{o}{=} \PYG{n}{find\PYGZus{}sphere\PYGZus{}center\PYGZus{}and\PYGZus{}radius}\PYG{p}{(}\PYG{n}{top}\PYG{p}{,} \PYG{n}{bottom}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Find closest point on circle to shock point}
+        \PYG{n}{closest\PYGZus{}point} \PYG{o}{=} \PYG{n}{closest\PYGZus{}point\PYGZus{}on\PYGZus{}circle}\PYG{p}{(}\PYG{n}{center}\PYG{p}{,} \PYG{n}{radius}\PYG{p}{,} \PYG{n}{shock}\PYG{p}{)}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate distances}
+        \PYG{n}{shock\PYGZus{}distance} \PYG{o}{=} \PYG{n}{np}\PYG{o}{.}\PYG{n}{sqrt}\PYG{p}{((}\PYG{n}{shock}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{center}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{])}\PYG{o}{**}\PYG{l+m+mi}{2} \PYG{o}{+} \PYG{p}{(}\PYG{n}{shock}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{o}{\PYGZhy{}} \PYG{n}{center}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{])}\PYG{o}{**}\PYG{l+m+mi}{2}\PYG{p}{)}
+        \PYG{n}{standoff\PYGZus{}distance\PYGZus{}px} \PYG{o}{=} \PYG{n}{shock\PYGZus{}distance} \PYG{o}{\PYGZhy{}} \PYG{n}{radius}
+
+        \PYG{c+c1}{\PYGZsh{} Calculate measurements}
+        \PYG{n}{standoff\PYGZus{}distance\PYGZus{}mm} \PYG{o}{=} \PYG{n}{standoff\PYGZus{}distance\PYGZus{}px} \PYG{o}{/} \PYG{n}{calibration\PYGZus{}factor}
+        \PYG{n}{sphere\PYGZus{}diameter\PYGZus{}mm} \PYG{o}{=} \PYG{p}{(}\PYG{l+m+mi}{2} \PYG{o}{*} \PYG{n}{radius}\PYG{p}{)} \PYG{o}{/} \PYG{n}{calibration\PYGZus{}factor}
+
+        \PYG{c+c1}{\PYGZsh{} Visualize the measurement}
+        \PYG{n}{fig}\PYG{p}{,} \PYG{n}{ax} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{subplots}\PYG{p}{(}\PYG{n}{figsize}\PYG{o}{=}\PYG{p}{(}\PYG{l+m+mi}{12}\PYG{p}{,} \PYG{l+m+mi}{8}\PYG{p}{))}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{imshow}\PYG{p}{(}\PYG{n}{img\PYGZus{}rgb}\PYG{p}{)}
+        \PYG{n}{circle} \PYG{o}{=} \PYG{n}{plt}\PYG{o}{.}\PYG{n}{Circle}\PYG{p}{(}\PYG{n}{center}\PYG{p}{,} \PYG{n}{radius}\PYG{p}{,} \PYG{n}{color}\PYG{o}{=}\PYG{l+s+s1}{\PYGZsq{}r\PYGZsq{}}\PYG{p}{,} \PYG{n}{fill}\PYG{o}{=}\PYG{k+kc}{False}\PYG{p}{)}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{add\PYGZus{}artist}\PYG{p}{(}\PYG{n}{circle}\PYG{p}{)}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{([}\PYG{n}{closest\PYGZus{}point}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{shock}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]],} \PYG{p}{[}\PYG{n}{closest\PYGZus{}point}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{n}{shock}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]],} \PYG{l+s+s1}{\PYGZsq{}b\PYGZhy{}\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{([}\PYG{n}{p}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]} \PYG{k}{for} \PYG{n}{p} \PYG{o+ow}{in} \PYG{n}{points}\PYG{p}{],} \PYG{p}{[}\PYG{n}{p}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{]} \PYG{k}{for} \PYG{n}{p} \PYG{o+ow}{in} \PYG{n}{points}\PYG{p}{],} \PYG{l+s+s1}{\PYGZsq{}ro\PYGZsq{}}\PYG{p}{)}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{plot}\PYG{p}{(}\PYG{n}{center}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{],} \PYG{n}{center}\PYG{p}{[}\PYG{l+m+mi}{1}\PYG{p}{],} \PYG{l+s+s1}{\PYGZsq{}go\PYGZsq{}}\PYG{p}{,} \PYG{n}{markersize}\PYG{o}{=}\PYG{l+m+mi}{10}\PYG{p}{)}
+        \PYG{n}{ax}\PYG{o}{.}\PYG{n}{set\PYGZus{}title}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Shock Standoff Distance: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{standoff\PYGZus{}distance\PYGZus{}mm}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ mm}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{\PYGZdq{}}
+                    \PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Sphere Diameter: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{sphere\PYGZus{}diameter\PYGZus{}mm}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ mm\PYGZdq{}}\PYG{p}{)}
+        \PYG{n}{plt}\PYG{o}{.}\PYG{n}{show}\PYG{p}{()}
+
+        \PYG{k}{return} \PYG{n}{standoff\PYGZus{}distance\PYGZus{}mm}\PYG{p}{,} \PYG{n}{sphere\PYGZus{}diameter\PYGZus{}mm}
+
+    \PYG{k}{def} \PYG{n+nf}{process\PYGZus{}all\PYGZus{}images}\PYG{p}{(}\PYG{n}{folder\PYGZus{}path}\PYG{p}{,} \PYG{n}{calibration\PYGZus{}factor}\PYG{p}{):}
+        \PYG{n}{results} \PYG{o}{=} \PYG{p}{\PYGZob{}\PYGZcb{}}
+        \PYG{k}{for} \PYG{n}{filename} \PYG{o+ow}{in} \PYG{n}{os}\PYG{o}{.}\PYG{n}{listdir}\PYG{p}{(}\PYG{n}{folder\PYGZus{}path}\PYG{p}{):}
+            \PYG{k}{if} \PYG{n}{filename}\PYG{o}{.}\PYG{n}{endswith}\PYG{p}{((}\PYG{l+s+s1}{\PYGZsq{}.bmp\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}.jpg\PYGZsq{}}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}.png\PYGZsq{}}\PYG{p}{)):}  \PYG{c+c1}{\PYGZsh{} Add or remove file extensions as needed}
+                \PYG{n}{image\PYGZus{}path} \PYG{o}{=} \PYG{n}{os}\PYG{o}{.}\PYG{n}{path}\PYG{o}{.}\PYG{n}{join}\PYG{p}{(}\PYG{n}{folder\PYGZus{}path}\PYG{p}{,} \PYG{n}{filename}\PYG{p}{)}
+                \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Processing }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{filename}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{...\PYGZdq{}}\PYG{p}{)}
+
+                \PYG{n}{standoff}\PYG{p}{,} \PYG{n}{diameter} \PYG{o}{=} \PYG{n}{measure\PYGZus{}shock\PYGZus{}standoff}\PYG{p}{(}\PYG{n}{image\PYGZus{}path}\PYG{p}{,} \PYG{n}{calibration\PYGZus{}factor}\PYG{p}{)}
+
+                \PYG{k}{if} \PYG{n}{standoff} \PYG{o+ow}{is} \PYG{o+ow}{not} \PYG{k+kc}{None}\PYG{p}{:}
+                    \PYG{c+c1}{\PYGZsh{} Extract Mach number from filename (assuming format like \PYGZsq{}M1\PYGZus{}75\PYGZus{}horizontal.bmp\PYGZsq{})}
+                    \PYG{n}{match} \PYG{o}{=} \PYG{n}{re}\PYG{o}{.}\PYG{n}{search}\PYG{p}{(}\PYG{l+s+sa}{r}\PYG{l+s+s1}{\PYGZsq{}M(\PYGZbs{}d+)\PYGZus{}(\PYGZbs{}d+)\PYGZsq{}}\PYG{p}{,} \PYG{n}{filename}\PYG{p}{)}
+                    \PYG{k}{if} \PYG{n}{match}\PYG{p}{:}
+                        \PYG{n}{mach\PYGZus{}number} \PYG{o}{=} \PYG{n+nb}{float}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{match}\PYG{o}{.}\PYG{n}{group}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{.}\PYG{l+s+si}{\PYGZob{}}\PYG{n}{match}\PYG{o}{.}\PYG{n}{group}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+                        \PYG{n}{results}\PYG{p}{[}\PYG{n}{mach\PYGZus{}number}\PYG{p}{]} \PYG{o}{=} \PYG{p}{\PYGZob{}}\PYG{l+s+s1}{\PYGZsq{}diameter\PYGZsq{}}\PYG{p}{:} \PYG{n}{diameter}\PYG{p}{,} \PYG{l+s+s1}{\PYGZsq{}standoff\PYGZsq{}}\PYG{p}{:} \PYG{n}{standoff}\PYG{p}{\PYGZcb{}}
+                        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Mach }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{mach\PYGZus{}number}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{: Shock standoff distance: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{standoff}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ mm, Sphere diameter: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{diameter}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ mm\PYGZdq{}}\PYG{p}{)}
+                    \PYG{k}{else}\PYG{p}{:}
+                        \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Warning: Couldn\PYGZsq{}t extract Mach number from filename }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{filename}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+                \PYG{k}{else}\PYG{p}{:}
+                    \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Warning: Couldn\PYGZsq{}t process }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{filename}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+
+        \PYG{k}{return} \PYG{n}{results}
+
+    \PYG{c+c1}{\PYGZsh{} Add this function to parse command\PYGZhy{}line arguments}
+    \PYG{k}{def} \PYG{n+nf}{parse\PYGZus{}arguments}\PYG{p}{():}
+        \PYG{n}{parser} \PYG{o}{=} \PYG{n}{argparse}\PYG{o}{.}\PYG{n}{ArgumentParser}\PYG{p}{(}\PYG{n}{description}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}Process shock standoff images.\PYGZdq{}}\PYG{p}{)}
+        \PYG{n}{parser}\PYG{o}{.}\PYG{n}{add\PYGZus{}argument}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}\PYGZhy{}image\PYGZdq{}}\PYG{p}{,} \PYG{n+nb}{type}\PYG{o}{=}\PYG{n+nb}{str}\PYG{p}{,} \PYG{n}{help}\PYG{o}{=}\PYG{l+s+s2}{\PYGZdq{}Path to a specific image to process\PYGZdq{}}\PYG{p}{)}
+        \PYG{k}{return} \PYG{n}{parser}\PYG{o}{.}\PYG{n}{parse\PYGZus{}args}\PYG{p}{()}
+
+    \PYG{c+c1}{\PYGZsh{} Modify the main part of the script}
+    \PYG{k}{if} \PYG{n+nv+vm}{\PYGZus{}\PYGZus{}name\PYGZus{}\PYGZus{}} \PYG{o}{==} \PYG{l+s+s2}{\PYGZdq{}\PYGZus{}\PYGZus{}main\PYGZus{}\PYGZus{}\PYGZdq{}}\PYG{p}{:}
+        \PYG{n}{args} \PYG{o}{=} \PYG{n}{parse\PYGZus{}arguments}\PYG{p}{()}
+
+        \PYG{c+c1}{\PYGZsh{} Usage}
+        \PYG{n}{folder\PYGZus{}path} \PYG{o}{=} \PYG{l+s+sa}{r}\PYG{l+s+s2}{\PYGZdq{}Lab 1\PYGZbs{}Data\PYGZbs{}Images\PYGZdq{}}
+        \PYG{n}{calibration\PYGZus{}factor} \PYG{o}{=} \PYG{l+m+mf}{14.3}  \PYG{c+c1}{\PYGZsh{} pixels/mm, as you provided}
+
+        \PYG{k}{if} \PYG{n}{args}\PYG{o}{.}\PYG{n}{image}\PYG{p}{:}
+            \PYG{c+c1}{\PYGZsh{} Process a single image}
+            \PYG{n}{image\PYGZus{}path} \PYG{o}{=} \PYG{n}{args}\PYG{o}{.}\PYG{n}{image}
+            \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Processing single image: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{image\PYGZus{}path}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+            \PYG{n}{standoff}\PYG{p}{,} \PYG{n}{diameter} \PYG{o}{=} \PYG{n}{measure\PYGZus{}shock\PYGZus{}standoff}\PYG{p}{(}\PYG{n}{image\PYGZus{}path}\PYG{p}{,} \PYG{n}{calibration\PYGZus{}factor}\PYG{p}{)}
+            \PYG{k}{if} \PYG{n}{standoff} \PYG{o+ow}{is} \PYG{o+ow}{not} \PYG{k+kc}{None}\PYG{p}{:}
+                \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Shock standoff distance: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{standoff}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ mm, Sphere diameter: }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{diameter}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ mm\PYGZdq{}}\PYG{p}{)}
+            \PYG{k}{else}\PYG{p}{:}
+                \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Warning: Couldn\PYGZsq{}t process }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{image\PYGZus{}path}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{)}
+        \PYG{k}{else}\PYG{p}{:}
+            \PYG{c+c1}{\PYGZsh{} Process all images in the folder}
+            \PYG{n}{data\PYGZus{}dict} \PYG{o}{=} \PYG{n}{process\PYGZus{}all\PYGZus{}images}\PYG{p}{(}\PYG{n}{folder\PYGZus{}path}\PYG{p}{,} \PYG{n}{calibration\PYGZus{}factor}\PYG{p}{)}
+
+            \PYG{c+c1}{\PYGZsh{} Now you can use data\PYGZus{}dict for further analysis}
+            \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+se}{\PYGZbs{}n}\PYG{l+s+s2}{Processed data:\PYGZdq{}}\PYG{p}{)}
+            \PYG{k}{for} \PYG{n}{mach}\PYG{p}{,} \PYG{n}{data} \PYG{o+ow}{in} \PYG{n}{data\PYGZus{}dict}\PYG{o}{.}\PYG{n}{items}\PYG{p}{():}
+                \PYG{n+nb}{print}\PYG{p}{(}\PYG{l+s+sa}{f}\PYG{l+s+s2}{\PYGZdq{}Mach }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{mach}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{: diameter = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}diameter\PYGZsq{}}\PYG{p}{]}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ mm, standoff = }\PYG{l+s+si}{\PYGZob{}}\PYG{n}{data}\PYG{p}{[}\PYG{l+s+s1}{\PYGZsq{}standoff\PYGZsq{}}\PYG{p}{]}\PYG{l+s+si}{:}\PYG{l+s+s2}{.2f}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+s2}{ mm\PYGZdq{}}\PYG{p}{)}
+
+
+
+\end{Verbatim}

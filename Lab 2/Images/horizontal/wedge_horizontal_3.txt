@@ -1,0 +1,6 @@
+Points:
+Point 1: (534.13, 437.25)
+Point 2: (113.90, 439.15)
+Point 3: (532.86, 229.67)
+
+Measured angle: 26.31°
