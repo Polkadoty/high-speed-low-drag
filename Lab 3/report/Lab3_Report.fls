@@ -276,6 +276,11 @@ INPUT ./CorrectedImages/Diamond_GridImage_corrected_vs_raw.png
 INPUT ./CorrectedImages/Diamond_GridImage_corrected_vs_raw.png
 INPUT ./CorrectedImages/Diamond_GridImage_corrected_vs_raw.png
 INPUT ./CorrectedImages/Diamond_GridImage_corrected_vs_raw.png
+INPUT ./CorrectedImages/Diamond_AoA0_Mach25_corrected_vs_original.png
+INPUT ./CorrectedImages/Diamond_AoA0_Mach25_corrected_vs_original.png
+INPUT ./CorrectedImages/Diamond_AoA0_Mach25_corrected_vs_original.png
+INPUT ./CorrectedImages/Diamond_AoA0_Mach25_corrected_vs_original.png
+INPUT ./CorrectedImages/Diamond_AoA0_Mach25_corrected_vs_original.png
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmr17.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT Lab3_Report.aux
