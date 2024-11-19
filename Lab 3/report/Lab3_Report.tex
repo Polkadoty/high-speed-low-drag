@@ -1,10 +1,12 @@
-%Set document format
+
 \documentclass[11pt]{article}
 \usepackage[margin=1in]{geometry}
 
 %Set up packages
 \usepackage{amsmath,amssymb,amsthm}
-\usepackage{graphicx}
+\usepackage[draft]{graphicx}
+\graphicspath{{./LabeledImages/}{./OtherPlots/}{./ReportImages/}{./CorrectedImages/}}
+\usepackage{subcaption}
 \usepackage{textcomp, gensymb}
 \usepackage{float}
 \usepackage{pdfpages}
@@ -16,6 +18,7 @@
 \usepackage{tabularx}
 
 \usepackage{mdframed}
+\usepackage{grffile}
 
 \newcommand{\bm}{\boldsymbol}
 \newcommand{\bI}{\mathbb{I}}
@@ -33,7 +36,6 @@
 % \noindent\makebox[\textwidth]{\rule{\textwidth}{0.2pt}}
 % \tableofcontents
 % \noindent\makebox[\textwidth]{\rule{\textwidth}{0.2pt}}
-% \pagebreak
 
 \textbf{Abstract} This experiment intends to compare experimental data from supersonic flow over a diamond-shaped airfoil with predictions from shock-expansion theory. Tests were conducted on a diamond profile at Machs $2.0, 2.25, 2.5,$ and $3.0$ across different angles of attack $0\degree, 3\degree,$ and $7\degree$. The findings show discrepancies from theory as the expansions and recompression shocks occurred much more upstream with our test model. Experimental results show notable deviations in $C_{L}$, $C_{D}$, and the center of pressure locations, $x_{\text{cp}}$ and $y_{\text{cp}}$, from theoretical values. Discrepancies can be attributed to the non-ideal geometry of the test article, particularly the blunted edges as opposed to the sharp corners shown in theory, and perturbations in the supposed angles of attack of the model in the flow. These factors provide critical sources of error in the experimental design.
 
@@ -161,7 +163,7 @@ Where the static pressures of the faces are:
 
 \section{Experimental Setup}
 
-The experiment was conducted using the Aerolab Variable Mach Number Wind Tunnel, capable of producing supersonic flows with Mach numbers ranging from approximately 2.25 to 3. The test section of the wind tunnel is nominally 3" * 3". A diamond airfoil model with four pressure transducers was mounted in the test section at a 0° angle of attack, and ran at 3 mach numbers with 3 angles of attack. The experimental setup is shown in Figure \ref{fig:lab3_setup}.
+The experiment was conducted using the Aerolab Variable Mach Number Wind Tunnel, capable of producing supersonic flows with Mach numbers ranging from approximately 2.25 to 3. The test section of the wind tunnel is nominally 3" * 3". A diamond airfoil model with four pressure transducers was mounted in the test section at a $0^\circ$ angle of attack, and ran at 3 mach numbers with 3 angles of attack. The experimental setup is shown in Figure \ref{fig:lab3_setup}.
 
 \begin{figure}[H]
     \centering
@@ -236,31 +238,34 @@ Care was taken to monitor the pressure of the compressed air tank to ensure cons
     \centering
     \begin{subfigure}{0.475\linewidth}
         \includegraphics[width = \linewidth]{LabeledImages/Mach2_AoA0.png}
-        \caption{Mach 2 flow at $0\degree$ angle of attack}
+        \caption{Mach 2 flow at $0^\circ$ angle of attack}
+        \label{fig:Mach2_AoA0}
     \end{subfigure}
     \hspace{2.5mm}
     \begin{subfigure}{0.475\linewidth}
         \includegraphics[width = \linewidth]{LabeledImages/Mach25_AoA0.png}
-        \caption{Mach 2.5 flow at $0\degree$ angle of attack}
+        \caption{Mach 2.5 flow at $0^\circ$ angle of attack}
+        \label{fig:Mach25_AoA0}
     \end{subfigure}
     \par\bigskip
     \begin{subfigure}{0.60\linewidth}
         \includegraphics[width=\linewidth]{LabeledImages/Mach3_AoA7.png}
-        \caption{Mach 3 flow at $7\degree$ angle of attack}
+        \caption{Mach 3 flow at $7^\circ$ angle of attack}
+        \label{fig:Mach3_AoA7}
     \end{subfigure}
-    \caption{Diamond Airfoil at different Machs and Angles of Attack}
-    \label{images}
+    \caption{Diamond Airfoil at different Mach numbers and angles of attack}
+    \label{fig:flow-images}
 \end{figure}
 
-Similarities and Differences between the different flows in Figure \ref{images} : 
+Similarities and Differences between the different flows in the above images: 
 \begin{itemize}
     \item Similarities:
     \begin{itemize}
-        \item Each flow was visualized using a Vertical Schliern setup.
-        \item The density gradients past the shocks and expansions is visibly clear. That is the density increase across the shock and density drop across the P-M fans are shown clearly by the light captured from the image.
-        \item In each image there is a visible turbulent wake at the end of the diamond airfoil (zone 4).
-        \item In each image, the expansion fans and recompression shocks seem to be occuring earlier than on a theoretical diamond airfoil. This discrepancy may be due to the test article not having sharp edges.
-        \item Unlabeled : At the bottom of images (a) and (b) in Figure \ref{images}, a wave reflection can be seen as the shock interacts with the wall enclosing the test section.
+        \item Each flow was visualized using a Vertical Schlieren setup.
+        \item The density gradients past the shocks and expansions are visibly clear. The density increase across the shock and density drop across the P-M fans are shown clearly by the light captured from the images.
+        \item In each image, there is a visible turbulent wake at the end of the diamond airfoil (zone 4).
+        \item In each image, the expansion fans and recompression shocks seem to be occurring earlier than on a theoretical diamond airfoil. This discrepancy may be due to the test article not having sharp edges.
+        \item Unlabeled: At the bottom of images (a) and (b) in the images, a wave reflection can be seen as the shock interacts with the wall enclosing the test section.
     \end{itemize}
     \vspace{10mm}
 
@@ -279,10 +284,10 @@ As Mach number increases, the shock wave angle decreases (refer to $\theta$-$\be
     \centering
     \includegraphics[width = \linewidth]{CorrectedImages/Diamond_GridImage_corrected_vs_raw.png}
     \caption{Corrected wind-off grid image, Raw vs Corrected}
-    \label{correction}
+    \label{fig:correction}
 \end{figure}
 
-The distortion is not very noticable, however we had to correct for a stretch in the horizontal direction as seen in the images of Figure \ref{correction} and \ref{correctionexample}.
+The distortion is not very noticable, however we had to correct for a stretch in the horizontal direction as seen in the images of Figure \ref{fig:correction} and \ref{fig:correctionexample}.
 \vspace{5mm}
 
 The raw resolution used was $800$ x $600$ pixels. After correction this became $745$ x $600$ pixels.
@@ -299,14 +304,32 @@ The distance between each grid point is $5\, \text{mm}$ and $10$ grid points wer
     \centering
     \includegraphics[width = \linewidth]{CorrectedImages/Diamond_AoA0_Mach25_corrected_vs_original.png}
     \caption{Corrected Example with Mach 2.5 flow at $0\degree$ angle of attack, Raw vs Corrected}
-    \label{correctionexample}
+    \label{fig:correctionexample}
 \end{figure}
 
 \pagebreak
 
 \subsection{True Mach \& Experimental vs Theoretical Surface Pressures}
 
-\pagebreak
+The experimental surface pressures showed notable deviations from theoretical predictions across all test cases. When comparing the measured pressures to those calculated using shock-expansion theory with the true Mach numbers (derived from stagnation and static pressure measurements), several key discrepancies emerged:
+
+\begin{itemize}
+    \item The experimental pressures were consistently higher than theoretical predictions on the forward surfaces (P1 and P4)
+    \item Pressure readings on the aft surfaces (P2 and P3) showed lower values than theory predicted
+    \item These differences became more pronounced at higher angles of attack
+\end{itemize}
+
+These discrepancies can be attributed to several factors:
+
+\begin{enumerate}
+    \item \textbf{Non-ideal Geometry}: The test article featured slightly blunted edges rather than the perfectly sharp corners assumed in theory. This causes the shock waves and expansion fans to form differently than predicted.
+    
+    \item \textbf{Boundary Layer Effects}: The presence of boundary layers, particularly at the leading edge, effectively changes the body shape the flow sees, altering the pressure distribution.
+    
+    \item \textbf{Flow Non-uniformity}: Small variations in the freestream conditions and potential flow angularity in the test section could contribute to asymmetric pressure distributions.
+    
+    \item \textbf{Measurement Uncertainty}: As detailed in the uncertainty analysis, the pressure measurements carry significant uncertainty, particularly at higher Mach numbers.
+\end{enumerate}
 
 \subsubsection{Pressure Transducer Uncertainty Analysis}
 
@@ -479,13 +502,119 @@ $$u_{\text{Total}} = \sqrt{\sum_{i=1}^n u_i^2}$$
 
 \subsection{Data Plots}
 
+The experimental data revealed several interesting trends when examining $C_D$ vs. Mach number, $C_L$ vs. angle of attack, and $C_D$ vs. $C_L$:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{OtherPlots/CdvM_AoA0}
+    \caption{$C_D$ vs Mach at $\alpha = 0^\circ$}
+    \label{fig:cd_vs_mach_0}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{OtherPlots/CdvM_AoA3}
+    \caption{$C_D$ vs Mach at $\alpha = 3^\circ$}
+    \label{fig:cd_vs_mach_3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\linewidth]{OtherPlots/CdvM_AoA7}
+    \caption{$C_D$ vs Mach at $\alpha = 7^\circ$}
+    \label{fig:cd_vs_mach_7}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{$C_D$ vs. Mach}: The drag coefficient showed a general decrease with increasing Mach number, though not as pronounced as theory predicts. This trend aligns with the expected behavior as shock wave angles become more oblique at higher Mach numbers.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{OtherPlots/CdvM_TheoryvsMeas}
+    \caption{Drag coefficient vs Mach number comparison between theory and experiment}
+    \label{fig:cd_vs_mach-theoryvmeas}
+\end{figure}
+
+\begin{itemize}    
+    \item \textbf{$C_L$ vs. AoA}: The lift coefficient increased nearly linearly with angle of attack, but with a lower slope than theoretical predictions. This suggests reduced lift effectiveness, likely due to the blunted leading edge and flow separation effects.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{OtherPlots/dragpolar_theoryvmeas}
+    \caption{Drag polar comparison between theory and experiment}
+    \label{fig:drag_polar-theoryvmeas}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{$C_D$ vs. $C_L$}: The drag polar showed higher minimum drag and a steeper increase in drag with lift compared to theoretical predictions, indicating increased form drag and possibly earlier flow separation.
+\end{itemize}
+
 \subsection{Theoretical Plots}
 
-\pagebreak
+Comparing the experimental results to linearized supersonic potential theory reveals significant insights:
+
+The theoretical predictions for lift and drag coefficients:
+\begin{equation*}
+    C_L = \frac{4\alpha}{\sqrt{M_\infty^2 - 1}}
+\end{equation*}
+
+\begin{equation*}
+    C_D = \frac{4\alpha^2 + 2\tan^2\theta}{\sqrt{M_\infty^2 - 1}}
+\end{equation*}
+
+The experimental results showed several deviations from these theoretical predictions:
+
+\begin{itemize}
+    \item The measured lift coefficients were consistently lower than theoretical values, particularly at higher angles of attack
+    \item Drag coefficients exceeded theoretical predictions across all test conditions
+    \item The relationship between $C_L$ and $\alpha$ showed less linearity than predicted
+\end{itemize}
+
+These discrepancies can be attributed to:
+\begin{enumerate}
+    \item Viscous effects not accounted for in the potential theory
+    \item Real gas effects at higher Mach numbers
+    \item The presence of boundary layers and flow separation
+    \item Manufacturing imperfections in the test article
+\end{enumerate}
 
 \subsection{Center of Pressure}
 
-\pagebreak
+The center of pressure location showed interesting behavior across the test conditions:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{OtherPlots/Xcp_TheorvMeas}
+    \caption{Center of pressure location comparison between theory and experiment}
+    \label{fig:xcp-theoryvmeas}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\linewidth]{OtherPlots/Ycp_TheorvMeas}
+    \caption{Vertical center of pressure location comparison between theory and experiment}
+    \label{fig:ycp-theoryvmeas}
+\end{figure}
+
+\begin{itemize}
+    \item For the symmetric case ($\alpha = 0^\circ$), the experimental center of pressure was located further forward than theory predicted
+    \item With increasing angle of attack, the center of pressure showed more movement than theoretical calculations suggested
+    \item The variation with Mach number was more pronounced in experimental results
+\end{itemize}
+
+This behavior differs from subsonic airfoils, where the center of pressure typically moves forward with increasing angle of attack. In our supersonic case, the center of pressure movement was more complex due to the interaction of shock waves and expansion fans.
+
+The discrepancies between theoretical and experimental values can be attributed to:
+\begin{enumerate}
+    \item The non-ideal geometry of the test article affecting shock and expansion fan locations
+    \item Boundary layer effects modifying the effective shape seen by the flow
+    \item Measurement uncertainties in pressure readings affecting the moment calculations
+    \item Flow separation effects at higher angles of attack
+\end{enumerate}
+
+
 
 \section{Conclusion}
 
