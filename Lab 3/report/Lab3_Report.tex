@@ -321,7 +321,7 @@ The experimental surface pressures showed notable deviations from theoretical pr
 These discrepancies can be attributed to several factors:
 
 \begin{enumerate}
-    \item \textbf{Non-ideal Geometry}: The test article featured slightly blunted edges rather than the perfectly sharp corners assumed in theory. This causes the shock waves and expansion fans to form differently than predicted.
+    \item \textbf{Non-ideal Geometry}: The test article is subscale, which causes the shock waves and expansion fans to form differently than predicted due to scaling boundary layer effects.
     
     \item \textbf{Boundary Layer Effects}: The presence of boundary layers, particularly at the leading edge, effectively changes the body shape the flow sees, altering the pressure distribution.
     
@@ -607,7 +607,7 @@ This behavior differs from subsonic airfoils, where the center of pressure typic
 
 The discrepancies between theoretical and experimental values can be attributed to:
 \begin{enumerate}
-    \item The non-ideal geometry of the test article affecting shock and expansion fan locations
+    \item The non-ideal/subscale geometry of the test article affecting shock and expansion fan locations
     \item Boundary layer effects modifying the effective shape seen by the flow
     \item Measurement uncertainties in pressure readings affecting the moment calculations
     \item Flow separation effects at higher angles of attack
@@ -617,7 +617,26 @@ The discrepancies between theoretical and experimental values can be attributed 
 
 \section{Conclusion}
 
-\pagebreak
+The experimental investigation of supersonic flow over a diamond airfoil at Mach numbers 2.0-3.0 and angles of attack 0°-7° revealed both agreements with and deviations from shock-expansion theory. While fundamental behaviors such as decreasing shock angles with increasing Mach number were confirmed, several significant discrepancies were observed:
+
+\begin{itemize}
+    \item Expansion fans and recompression shocks occurred more upstream than theoretically predicted
+    \item Measured drag coefficients exceeded theoretical predictions across all test conditions
+    \item Lift coefficients were consistently lower than theoretical values, particularly at higher angles of attack
+    \item Center of pressure locations showed greater variation with Mach number than theory suggested
+    \item Pressure distributions deviated systematically, with higher pressures on forward surfaces and lower pressures on aft surfaces
+\end{itemize}
+
+These deviations can be attributed to physical phenomena not accounted for in shock-expansion theory:
+\begin{itemize}
+    \item Boundary layer effects modifying the effective body shape
+    \item Viscous effects, particularly at the leading edge
+    \item Flow separation at higher angles of attack
+\end{itemize}
+
+Significant measurement uncertainties (±0.81 psi for static pressure, ±4.06 psi for stagnation pressure) affected the calculated aerodynamic coefficients. Future experiments could benefit from sharper-edged test articles, more precise pressure measurements, and additional instrumentation for boundary layer characterization.
+
+Despite these limitations, the experiment successfully demonstrated the fundamental physics of supersonic flow over a diamond airfoil and highlighted important practical limitations of theoretical predictions in supersonic aerodynamics.
 
 \hypertarget{reference}{}
 \section{References}
