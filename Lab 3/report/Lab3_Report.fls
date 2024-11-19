@@ -1,8 +1,8 @@
-PWD c:/GitHub/high-speed-low-drag/Lab 3/report
+PWD c:/Users/andre/Downloads/bash_home/high-speed-low-drag/Lab 3/report
 INPUT c:/texlive/2024/texmf.cnf
 INPUT c:/texlive/2024/texmf-dist/web2c/texmf.cnf
 INPUT c:/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT c:/GitHub/high-speed-low-drag/Lab 3/report/Lab3_Report.tex
+INPUT c:/Users/andre/Downloads/bash_home/high-speed-low-drag/Lab 3/report/Lab3_Report.tex
 OUTPUT Lab3_Report.log
 INPUT c:/texlive/2024/texmf-dist/tex/latex/base/article.cls
 INPUT c:/texlive/2024/texmf-dist/tex/latex/base/article.cls
@@ -247,7 +247,6 @@ INPUT ./ReportImages/DiamondAirfoilSurfacePressures.png
 INPUT ./ReportImages/DiamondAirfoilSurfacePressures.png
 INPUT ./ReportImages/DiamondAirfoilSurfacePressures.png
 INPUT ./ReportImages/DiamondAirfoilSurfacePressures.png
-INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
 INPUT ./ReportImages/experimental-setup.png
 INPUT ./ReportImages/experimental-setup.png
 INPUT ./ReportImages/experimental-setup.png
@@ -294,6 +293,8 @@ INPUT ./OtherPlots/CdvM_AoA0.png
 INPUT ./OtherPlots/CdvM_AoA0.png
 INPUT ./OtherPlots/CdvM_AoA0.png
 INPUT ./OtherPlots/CdvM_AoA0.png
+INPUT ./OtherPlots/CdvM_AoA0.png
+INPUT ./OtherPlots/CdvM_AoA3.png
 INPUT ./OtherPlots/CdvM_AoA3.png
 INPUT ./OtherPlots/CdvM_AoA3.png
 INPUT ./OtherPlots/CdvM_AoA3.png
@@ -302,6 +303,8 @@ INPUT ./OtherPlots/CdvM_AoA7.png
 INPUT ./OtherPlots/CdvM_AoA7.png
 INPUT ./OtherPlots/CdvM_AoA7.png
 INPUT ./OtherPlots/CdvM_AoA7.png
+INPUT ./OtherPlots/CdvM_AoA7.png
+INPUT ./OtherPlots/CdvM_TheoryvsMeas.png
 INPUT ./OtherPlots/CdvM_TheoryvsMeas.png
 INPUT ./OtherPlots/CdvM_TheoryvsMeas.png
 INPUT ./OtherPlots/CdvM_TheoryvsMeas.png
@@ -310,6 +313,8 @@ INPUT ./OtherPlots/dragpolar_theoryvmeas.png
 INPUT ./OtherPlots/dragpolar_theoryvmeas.png
 INPUT ./OtherPlots/dragpolar_theoryvmeas.png
 INPUT ./OtherPlots/dragpolar_theoryvmeas.png
+INPUT ./OtherPlots/dragpolar_theoryvmeas.png
+INPUT ./OtherPlots/Xcp_TheorvMeas.png
 INPUT ./OtherPlots/Xcp_TheorvMeas.png
 INPUT ./OtherPlots/Xcp_TheorvMeas.png
 INPUT ./OtherPlots/Xcp_TheorvMeas.png
@@ -318,6 +323,8 @@ INPUT ./OtherPlots/Ycp_TheorvMeas.png
 INPUT ./OtherPlots/Ycp_TheorvMeas.png
 INPUT ./OtherPlots/Ycp_TheorvMeas.png
 INPUT ./OtherPlots/Ycp_TheorvMeas.png
+INPUT ./OtherPlots/Ycp_TheorvMeas.png
+INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmtt10.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmr17.tfm
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT Lab3_Report.aux
