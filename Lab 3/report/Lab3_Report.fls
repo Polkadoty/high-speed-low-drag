@@ -1,8 +1,8 @@
-PWD c:/Users/andre/Downloads/bash_home/high-speed-low-drag/Lab 3/report
+PWD c:/GitHub/high-speed-low-drag/Lab 3/report
 INPUT c:/texlive/2024/texmf.cnf
 INPUT c:/texlive/2024/texmf-dist/web2c/texmf.cnf
 INPUT c:/texlive/2024/texmf-var/web2c/pdftex/pdflatex.fmt
-INPUT c:/Users/andre/Downloads/bash_home/high-speed-low-drag/Lab 3/report/Lab3_Report.tex
+INPUT c:/GitHub/high-speed-low-drag/Lab 3/report/Lab3_Report.tex
 OUTPUT Lab3_Report.log
 INPUT c:/texlive/2024/texmf-dist/tex/latex/base/article.cls
 INPUT c:/texlive/2024/texmf-dist/tex/latex/base/article.cls
@@ -147,6 +147,10 @@ INPUT c:/texlive/2024/texmf-dist/tex/latex/caption/caption.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/caption/caption.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/caption/caption3.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/caption/caption3.sty
+INPUT c:/texlive/2024/texmf-dist/tex/latex/tools/tabularx.sty
+INPUT c:/texlive/2024/texmf-dist/tex/latex/tools/tabularx.sty
+INPUT c:/texlive/2024/texmf-dist/tex/latex/tools/array.sty
+INPUT c:/texlive/2024/texmf-dist/tex/latex/tools/array.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/mdframed/mdframed.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/mdframed/mdframed.sty
 INPUT c:/texlive/2024/texmf-dist/tex/latex/l3packages/xparse/xparse.sty
@@ -241,6 +245,11 @@ INPUT ./ReportImages/DiamondAirfoilSurfacePressures.png
 INPUT ./ReportImages/DiamondAirfoilSurfacePressures.png
 INPUT ./ReportImages/DiamondAirfoilSurfacePressures.png
 INPUT ./ReportImages/DiamondAirfoilSurfacePressures.png
+INPUT ./ReportImages/experimental-setup.png
+INPUT ./ReportImages/experimental-setup.png
+INPUT ./ReportImages/experimental-setup.png
+INPUT ./ReportImages/experimental-setup.png
+INPUT ./ReportImages/experimental-setup.png
 INPUT c:/texlive/2024/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
 INPUT ./LabeledImages/Mach2_AoA0.png
 INPUT ./LabeledImages/Mach2_AoA0.png

@@ -13,6 +13,7 @@
 \usepackage{cancel}
 \usepackage{subcaption}
 \usepackage{caption}
+\usepackage{tabularx}
 
 \usepackage{mdframed}
 
@@ -160,7 +161,73 @@ Where the static pressures of the faces are:
 
 \section{Experimental Setup}
 
-\pagebreak
+The experiment was conducted using the Aerolab Variable Mach Number Wind Tunnel, capable of producing supersonic flows with Mach numbers ranging from approximately 2.25 to 3. The test section of the wind tunnel is nominally 3" * 3". A diamond airfoil model with four pressure transducers was mounted in the test section at a 0° angle of attack, and ran at 3 mach numbers with 3 angles of attack. The experimental setup is shown in Figure \ref{fig:lab3_setup}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{ReportImages/experimental-setup.png}
+    \caption{Experimental setup for Lab 3: Supersonic Flow over a Diamond Airfoil}
+    \label{fig:lab3_setup}
+\end{figure}
+
+
+\begin{table}[H]
+    \centering
+    \caption{Schlieren System Components and Functions}
+    \renewcommand{\arraystretch}{1.5} % Adjust row height
+    \begin{tabularx}{\textwidth}{|p{3.5cm}|X|} % Use X for flexible width
+    \hline
+    \textbf{Component} & \textbf{Function} \\
+    \hline
+    Pulsed Light Source & Provides high-intensity, short-duration illumination for capturing instantaneous flow features. \\
+    \hline
+    Pin hole & Acts as a spatial filter to create a point source of light, improving image quality by reducing diffuse light. \\
+    \hline
+    Color filter & Optional component that can be used to produce color Schlieren images or filter specific wavelengths. \\
+    \hline
+    Concave Mirror 1 & Collimates the light beam from the point source into parallel rays that pass through the test section. \\
+    \hline
+    Dummy mirror & Redirects the light path to create a folded system, reducing the overall space requirements. \\
+    \hline
+    Test Section & Contains the flow and model being studied, where density gradients cause light ray deflection. \\
+    \hline
+    Concave Mirror 2 & Focuses the parallel light rays after they pass through the test section. \\
+    \hline
+    Knife Edge & Blocks a portion of the refracted light rays to create contrast in the final image based on density gradients. \\
+    \hline
+    Camera & Records the resulting Schlieren image showing flow features. \\
+    \hline
+    PT (Pressure Transducer) & Measures pressure at various points in the flow field. \\
+    \hline
+    DAQ (Data Acquisition) & Collects and digitizes pressure measurements from the transducers. \\
+    \hline
+    PC & Controls data acquisition and image capture, stores experimental data. \\
+    \hline
+    \end{tabularx}
+    \label{tab:schlieren_components}
+\end{table}
+
+\subsection{Data Acquisition}
+
+Pressure measurements were recorded using a LabVIEW-based data acquisition system with six pressure transducers.
+
+The pressure data was recorded in volts (gauge pressure) and later converted to appropriate units using calibration constants 15psi/0.1V and 60psi/0.1V.
+
+\subsection{Experimental Procedure}
+
+The experiment followed these steps for each run:
+
+\begin{enumerate}
+    \item The wind tunnel was started in the sequence: power, hydraulic, then run.
+    \item The initial Mach number was set to a given value and angle of attack was set to 1 of 3 values at that mach number.
+    \item Since the pressure transducers had problems, we instead focused on flow visualization using vertical Schlieren.
+    \item The wind tunnel was operated only while the run button was held, and shut down in the reverse order of startup once the airflow stopped.
+    \item Mach number was adjusted by changing the area ratio and chamber pressure according to the manufacturer's specifications, referencing the "Approximate Minimum Stagnation Pressure vs Mach Number" chart.
+    \item The angle of attack was adjusted by adjusting the angle of the diamond airfoil. In post the images were corrected for distortion and mirrored over the y-axis to have a positive angle of attack pointing upwards.
+\end{enumerate}
+
+Care was taken to monitor the pressure of the compressed air tank to ensure consistent flow quality across all runs. The experiment was repeated for all mach numbers and angles of attack.
+
 
 \section{Results \& Discussion}
 
@@ -237,9 +304,178 @@ The distance between each grid point is $5\, \text{mm}$ and $10$ grid points wer
 
 \pagebreak
 
-\subsection{True Mach \& Experimental vs Theoeritcal Surface Pressures}
+\subsection{True Mach \& Experimental vs Theoretical Surface Pressures}
 
 \pagebreak
+
+\subsubsection{Pressure Transducer Uncertainty Analysis}
+
+
+The resolution is determined by the digitization of the analog signal:
+
+$$
+\text{Resolution} = \text{Slope} \cdot \frac{\text{Steps}}{\text{Full Scale Voltage}}
+$$
+
+where:
+\begin{enumerate}
+    \item Steps = $2^{\text{Bits}} = 2^{12} = 4096$
+    \item Full Scale Voltage = 0.5V
+    \item Step size = $\frac{\text{Steps}}{\text{Full Scale Voltage}} = 1\text{e-}4$
+\end{enumerate}
+
+
+Static Pressure ($\approx 60 psi$) Individual Error Components
+
+$$
+\begin{aligned}
+\text{Resolution} &= 0.0183 \text{ psi} = 0.3947 \text{ kPa} \\
+\text{Linearity} &= 60 \text{ psi} \cdot 0.0025 = 0.15 \text{ psi} \\
+\text{Repeatability} &= 60 \text{ psi} \cdot 0.002 = 0.12 \text{ psi} \\
+\text{Temperature Shift} &= 60 \text{ psi} \cdot 0.0075 = 0.45 \text{ psi} \\
+\text{Null Shift} &= 60 \text{ psi} \cdot 0.005 = 0.3 \text{ psi}
+\end{aligned}
+$$
+
+Stagnation Pressure ($\approx 300 psi$)
+
+Individual Error Components
+$$
+\begin{aligned}
+\text{Resolution} &= 0.0732 \text{ psi} = 1.579 \text{ kPa} \\
+\text{Linearity} &= 300 \text{ psi} \cdot 0.0025 = 0.75 \text{ psi} \\
+\text{Repeatability} &= 300 \text{ psi} \cdot 0.002 = 0.6 \text{ psi} \\
+\text{Temperature Shift} &= 300 \text{ psi} \cdot 0.075 = 2.25 \text{ psi} \\
+\text{Null Shift} &= 300 \text{ psi} \cdot 0.005 = 1.5 \text{ psi}
+\end{aligned}
+$$
+
+The total uncertainty is calculated using the Root Mean Square (RMS) method, combining all individual error components:
+
+$$
+u_{\text{RMS}} = \sqrt{u_1^2 + u_2^2 + ... + u_n^2}
+$$
+
+where $u_i$ represents each individual uncertainty component.
+
+$$
+u_{\text{Total}} = \sqrt{\text{Resolution}^2 + \text{Linearity}^2 + \text{Repeatability}^2 + \text{Temperature Shift}^2 + \text{Null Shift}^2}
+$$
+
+$$
+\begin{aligned}
+\text{Static Pressure Uncertainty} &= \pm 0.81 \text{ psi} \\
+\text{Stagnation Pressure Uncertainty} &= \pm 4.06 \text{ psi}
+\end{aligned}
+$$
+
+\begin{enumerate}
+    \item All measurements are based on a full scale voltage of 0.5V.
+    \item 12-bit analog-to-digital conversion is used (4096 steps).
+    \item Uncertainty components are manufacturer-specified percentages of full scale.
+    \item Temperature and null shift effects are included in the total uncertainty calculation.
+\end{enumerate}
+
+\subsubsection{Mach Number \& Aerodynamic Coefficient Uncertainty Analysis}
+
+The Mach number is determined using the ratio of stagnation to static pressure:
+
+$$M = \sqrt{\frac{2}{\gamma-1}\left[\left(\frac{P_0}{P}\right)^{\frac{\gamma-1}{\gamma}} - 1\right]}$$
+
+\noindent where:
+\begin{enumerate}
+    \item $P_0$ is the stagnation pressure
+    \item $P$ is the static pressure
+    \item $\gamma$ is the specific heat ratio (1.4 for air)
+\end{enumerate}
+
+\noindent Individual Error Components for Mach Number:
+$$
+\begin{aligned}
+\text{Stagnation Pressure Term} &= \frac{\partial M}{\partial P_0}\Delta P_0 = \pm 4.06 \text{ psi} \\
+\text{Static Pressure Term} &= \frac{\partial M}{\partial P}\Delta P = \pm 0.81 \text{ psi}
+\end{aligned}
+$$
+
+The total uncertainty is calculated using the Root Mean Square (RMS) method:
+
+$$u_M = \sqrt{\left(\frac{\partial M}{\partial P_0}\Delta P_0\right)^2 + \left(\frac{\partial M}{\partial P}\Delta P\right)^2}$$
+
+\vspace{5mm}
+
+\noindent For the lift coefficient:
+
+$$C_l = \frac{1}{\gamma P_{\infty} M_{\infty}^2 \cos{(\theta)}} [(P_3 - P_2)\cos{(\theta + \alpha)} + (P_4-P_1)\cos{(\theta-\alpha)}]$$
+
+\noindent Individual Error Components
+$$
+\begin{aligned}
+\text{P}_1 \text{ Term} &= \frac{\partial C_l}{\partial P_1}\Delta P_1 = \pm 0.81 \text{ psi} \\
+\text{P}_2 \text{ Term} &= \frac{\partial C_l}{\partial P_2}\Delta P_2 = \pm 0.81 \text{ psi} \\
+\text{P}_3 \text{ Term} &= \frac{\partial C_l}{\partial P_3}\Delta P_3 = \pm 0.81 \text{ psi} \\
+\text{P}_4 \text{ Term} &= \frac{\partial C_l}{\partial P_4}\Delta P_4 = \pm 0.81 \text{ psi} \\
+\text{Mach Term} &= \frac{\partial C_l}{\partial M_{\infty}}\Delta M_{\infty} = -\frac{2C_l}{M_{\infty}}u_M
+\end{aligned}
+$$
+
+\vspace{5mm}
+
+\noindent For the drag coefficient:
+
+$$C_d = \frac{1}{\gamma P_{\infty} M_{\infty}^2 \cos{(\theta)}} [(P_1 - P_4)\sin{(\theta - \alpha)} + (P_3 - P_2)\sin{(\theta + \alpha)}]$$
+
+\noindent Individual Error Components
+$$
+\begin{aligned}
+\text{P}_1 \text{ Term} &= \frac{\partial C_d}{\partial P_1}\Delta P_1 = \pm 0.81 \text{ psi} \\
+\text{P}_2 \text{ Term} &= \frac{\partial C_d}{\partial P_2}\Delta P_2 = \pm 0.81 \text{ psi} \\
+\text{P}_3 \text{ Term} &= \frac{\partial C_d}{\partial P_3}\Delta P_3 = \pm 0.81 \text{ psi} \\
+\text{P}_4 \text{ Term} &= \frac{\partial C_d}{\partial P_4}\Delta P_4 = \pm 0.81 \text{ psi} \\
+\text{Mach Term} &= \frac{\partial C_d}{\partial M_{\infty}}\Delta M_{\infty} = -\frac{2C_d}{M_{\infty}}u_M
+\end{aligned}
+$$
+
+\vspace{5mm}
+
+\noindent For the center of pressure (at $\alpha = 0\degree$):
+
+$$\frac{CP_x}{c} = \frac{\frac{1}{4}P_1 + \frac{3}{4}P_2}{P_1 + P_2}$$
+
+\noindent Individual Error Components
+$$
+\begin{aligned}
+\text{P}_1 \text{ Term} &= \frac{\partial (CP_x/c)}{\partial P_1}\Delta P_1 = \pm 0.81 \text{ psi} \\
+\text{P}_2 \text{ Term} &= \frac{\partial (CP_x/c)}{\partial P_2}\Delta P_2 = \pm 0.81 \text{ psi}
+\end{aligned}
+$$
+
+\noindent For y-direction center of pressure:
+
+$$\frac{CP_y}{t} = \frac{P_1 - P_2 - P_3 + P_4}{2(P_1 - P_2 + P_3 - P_4)}$$
+
+\noindent Individual Error Components
+$$
+\begin{aligned}
+\text{P}_1 \text{ Term} &= \frac{\partial (CP_y/t)}{\partial P_1}\Delta P_1 = \pm 0.81 \text{ psi} \\
+\text{P}_2 \text{ Term} &= \frac{\partial (CP_y/t)}{\partial P_2}\Delta P_2 = \pm 0.81 \text{ psi} \\
+\text{P}_3 \text{ Term} &= \frac{\partial (CP_y/t)}{\partial P_3}\Delta P_3 = \pm 0.81 \text{ psi} \\
+\text{P}_4 \text{ Term} &= \frac{\partial (CP_y/t)}{\partial P_4}\Delta P_4 = \pm 0.81 \text{ psi}
+\end{aligned}
+$$
+
+The total uncertainty for each coefficient is calculated using the Root Mean Square (RMS) method:
+
+$$u_{\text{Total}} = \sqrt{\sum_{i=1}^n u_i^2}$$
+
+\noindent where $u_i$ represents each individual uncertainty component.
+
+\begin{enumerate}
+    \item All pressure measurements use the uncertainties determined in the pressure transducer analysis
+    \item Mach number uncertainty is propagated through the coefficient calculations
+    \item Angular uncertainties in $\alpha$ and $\theta$ are assumed negligible compared to pressure uncertainties
+    \item Temperature effects are included through the pressure uncertainties
+    \item Partial derivatives are evaluated at the measured conditions
+\end{enumerate}
 
 \subsection{Data Plots}
 
