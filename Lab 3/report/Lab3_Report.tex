@@ -162,7 +162,7 @@ Where the static pressures of the faces are:
 
 \section{Experimental Setup}
 
-The experiment was conducted using the Aerolab Variable Mach Number Wind Tunnel, capable of producing supersonic flows with Mach numbers ranging from approximately 2.25 to 3. The test section of the wind tunnel is nominally 3" * 3". A diamond airfoil model with four pressure transducers was mounted in the test section at a $0^\circ$ angle of attack, and ran at 3 mach numbers with 3 angles of attack. The experimental setup is shown in Figure \ref{fig:lab3_setup}.
+The experiment was conducted using the Aerolab Variable Mach Number Wind Tunnel, capable of producing supersonic flows with Mach numbers ranging from approximately 2.0 to 3.0. The test section of the wind tunnel is nominally 3" x 3". A diamond airfoil model with four pressure transducers was mounted in the test section at a $0^\degree$ angle of attack, and ran at 3 mach numbers with 3 angles of attack. The experimental setup is shown in Figure \ref{fig:lab3_setup}.
 
 \begin{figure}[H]
     \centering
@@ -414,14 +414,32 @@ $$M = \sqrt{\frac{2}{\gamma-1}\left[\left(\frac{P_0}{P}\right)^{\frac{\gamma-1}{
 \noindent Individual Error Components for Mach Number:
 $$
 \begin{aligned}
-\text{Stagnation Pressure Term} &= \frac{\partial M}{\partial P_0}\Delta P_0 = \pm 4.06 \text{ psi} \\
-\text{Static Pressure Term} &= \frac{\partial M}{\partial P}\Delta P = \pm 0.81 \text{ psi}
+\text{Stagnation Pressure Term} &= \frac{\partial M}{\partial P_0}\Delta P_0 (\text{not computed})\\
+\text{Static Pressure Term} &= \frac{\partial M}{\partial P}\Delta P(\text{not computed})
 \end{aligned}
 $$
 
 The total uncertainty is calculated using the Root Mean Square (RMS) method:
 
 $$u_M = \sqrt{\left(\frac{\partial M}{\partial P_0}\Delta P_0\right)^2 + \left(\frac{\partial M}{\partial P}\Delta P\right)^2}$$
+\vspace{5mm}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{| c | c | c | c | c |}
+    \hline
+    \textbf{Angle of Attack} & \textbf{M = 2.0} &\textbf{M = 2.25} & \textbf{M = 2.50} & \textbf{M = 3.0} \\[2mm]
+    \hline
+    $\alpha = 0\degree$ & $2.039$ & $2.343$ & $2.531$ & $2.960$ \\[2mm]
+    \hline
+    $\alpha = 3\degree$ & $2.046$ & $2.340$ & $2.534$ & $2.960$ \\[2mm]
+    \hline
+    $\alpha = 7\degree$ & $2.041$ & $2.332$ & $2.532$ & $2.965$ \\[2mm]
+    \hline  
+    \end{tabular}
+    \caption{True Mach}
+    \label{truemach}
+\end{table}
 
 \vspace{5mm}
 
@@ -634,9 +652,12 @@ These deviations can be attributed to physical phenomena not accounted for in sh
     \item Flow separation at higher angles of attack
 \end{itemize}
 
-Significant measurement uncertainties (±0.81 psi for static pressure, ±4.06 psi for stagnation pressure) affected the calculated aerodynamic coefficients. Future experiments could benefit from sharper-edged test articles, more precise pressure measurements, and additional instrumentation for boundary layer characterization.
+Significant measurement uncertainties affected the calculated aerodynamic coefficients. Future experiments could benefit from sharper-edged test articles, more precise pressure measurements, and additional instrumentation for boundary layer characterization.
+\vspace{2mm}
 
 Despite these limitations, the experiment successfully demonstrated the fundamental physics of supersonic flow over a diamond airfoil and highlighted important practical limitations of theoretical predictions in supersonic aerodynamics.
+
+\pagebreak
 
 \hypertarget{reference}{}
 \section{References}
