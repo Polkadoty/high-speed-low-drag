@@ -1,0 +1,211 @@
+\documentclass{article}
+
+%package setup
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{fancyhdr}
+\usepackage[margin=1in]{geometry}
+\usepackage{comment}
+\usepackage{placeins}
+\usepackage{parskip}
+\usepackage{subcaption}
+\usepackage{appendix}
+\usepackage{soul}
+\usepackage{comment}
+\PassOptionsToPackage{hyphens}{url}\usepackage[hidelinks]{hyperref}
+\usepackage{matlab-prettifier}
+\usepackage{minted}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{textcomp, gensymb}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usetikzlibrary{arrows.meta, positioning, decorations.pathmorphing}
+\usepackage{caption}
+
+\pagestyle{fancy}
+\fancyhf{} % Clear header/footer settings
+\rhead{\thepage} % Page number on the right in the header
+\lhead{ASE162M Report 4} % Your report title on the left
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \includegraphics[width=10cm]{ase-logo-formal.png}  % Adjust the width as needed
+  \vspace{1cm}  % Add some vertical space
+ 
+  \Large \textbf{ASE 162M High-Speed Aerodynamics}\\
+  \large \textbf{Section 14275}\\
+  \vspace{0.5cm}
+  \textbf{Tuesday: 4:00 - 6:00 pm}\\
+ 
+  \vspace{1cm}
+ 
+  \hrule
+  \vspace{0.5cm}
+ 
+  \begin{center}
+  \Huge \textbf{Final Exam}\\
+  \end{center}
+ 
+  \vspace{0.5cm}
+  \hrule
+ 
+  \vspace{1cm}  
+ 
+  \normalsize \textbf{Andrew Doty}\\
+  \normalsize \textbf{Due Date: December 14, 2024}
+ 
+\end{titlepage}
+\newpage
+
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+
+\section{Paper 1: Visualization of Supersonic Free and Confined Jet using Planar Laser Mie Scattering Technique}
+
+\subsection{Paper Information}
+\textbf{Title:} Visualization of Supersonic Free and Confined Jet using Planar Laser Mie Scattering Technique \\
+\textbf{Authors:} S.K. Karthick, G. Jagadeesh and K.P.J. Reddy \\
+\textbf{Publication:} Journal of the Indian Institute of Science \\
+\textbf{Publication Date:} January-March 2016
+
+\subsection{Citation (Chicago Format)}
+Karthick, S.K., G. Jagadeesh, and K.P.J. Reddy. "Visualization of Supersonic Free and Confined Jet using Planar Laser Mie Scattering Technique." Journal of the Indian Institute of Science 96, no. 1 (2016): 29-45.
+
+\subsection{Experimental Technique}
+The experimental technique used is Planar Laser Mie Scattering (PLMS), which is an optical flow visualization method.
+
+\subsection{Methodology}
+PLMS works by illuminating particles in the flow field with a laser sheet and capturing the scattered light. The technique involves:
+\begin{itemize}
+    \item Using a high-power laser converted into a sheet (thickness ~0.5 mm).
+    \item Seeding the flow with particles (DOP or TiO2).
+    \item Capturing scattered light using high-speed cameras.
+    \item Processing images to extract flow features.
+\end{itemize}
+
+\subsection{Experimental Apparatus}
+The setup included:
+\begin{itemize}
+    \item A Mach 2.0 supersonic wind tunnel with optical access.
+    \item Nd-YAG laser (532 nm, 500 mJ) for free jet studies.
+    \item Nd-YLF laser (527 nm, 24 mJ) for confined jet studies.
+    \item Phantom Miro 110 high-speed camera.
+    \item An in-house designed seeder unit with a modified Laskin nozzle.
+    \item Optical glass windows for flow visualization.
+\end{itemize}
+
+\subsection{Flow Application}
+The technique was applied to:
+\begin{itemize}
+    \item Supersonic axisymmetric free jet (Mach 1.37-2.5).
+    \item Supersonic rectangular confined jet (Mach 2.0).
+\end{itemize}
+
+The authors chose PLMS because it provides:
+\begin{itemize}
+    \item Instantaneous flow field visualization.
+    \item The ability to capture both large-scale structures and fine details.
+    \item Non-intrusive measurement capability.
+\end{itemize}
+
+\subsection{Key Conclusions}
+\begin{enumerate}
+    \item PLMS successfully captured important flow features, including the Mach disc, shear layer instability, and shock cells in supersonic jets.
+    \item The shock cell spacing increases with increasing Mach number ratio.
+    \item Particle lag significantly affects the magnitude of Reynolds stresses in supersonic flow measurements.
+\end{enumerate}
+
+\subsection{Suggested Improvements}
+\begin{enumerate}
+    \item Implement advanced particle tracking algorithms to better quantify particle lag effects.
+    \item Develop improved seeding methods for near-wall regions.
+    \item Extend the technique to higher Mach numbers with better temperature control to prevent window fogging.
+\end{enumerate}
+
+\subsection{Insights Gained}
+\begin{enumerate}
+    \item Particle selection and seeding methodology are crucial for accurate flow visualization in supersonic flows.
+    \item The semi-local scaling shows better agreement with incompressible flows than conventional Morkovin's scaling.
+    \item Proper image processing techniques are essential for extracting meaningful flow features from raw PLMS data.
+\end{enumerate}
+
+
+\section{Paper 2: Particle Lag in Supersonic Turbulent Boundary Layers}
+
+\subsection{Paper Information}
+\textbf{Title:} The Effect of Particle Lag on Supersonic Turbulent Boundary Layer Statistics \\
+\textbf{Authors:} K. Todd Lowe, Gwibo Byun and Roger L. Simpson \\
+\textbf{Publication:} AIAA SciTech Forum \\
+\textbf{Publication Date:} January 2014
+
+\subsection{Citation (Chicago Format)}
+Lowe, K. Todd, Gwibo Byun, and Roger L. Simpson. "The Effect of Particle Lag on Supersonic Turbulent Boundary Layer Statistics." In 52nd Aerospace Sciences Meeting, AIAA SciTech Forum. 2014.
+
+\subsection{Experimental Technique}
+The study uses Laser Doppler Velocimetry (LDV) combined with particle lag analysis to study supersonic turbulent boundary layers.
+
+\subsection{Methodology}
+The technique involves:
+\begin{itemize}
+    \item Three-component laser Doppler velocimetry measurements.
+    \item Analysis of particle response to turbulent fluctuations.
+    \item Application of a linear first-order lag correction scheme.
+    \item Use of Reynolds stress spectral functions for corrections.
+\end{itemize}
+
+\subsection{Experimental Apparatus}
+Key components included:
+\begin{itemize}
+    \item Mach 2.0 supersonic wind tunnel with optical access.
+    \item Small supersonic LDV system with 3 measurement volumes.
+    \item Diode-pumped solid state laser (532 nm, 1.5 W).
+    \item Argon ion laser (514.5 nm and 488 nm, 1.9 W).
+    \item High-quality optical glass window for LDV measurements.
+    \item DOP seeding system with modified Laskin nozzle.
+\end{itemize}
+
+\subsection{Flow Application}
+The technique was applied to:
+\begin{itemize}
+    \item Mach 2.0 supersonic smooth wall turbulent boundary layer.
+    \item Reynolds number based on momentum thickness of approximately 15,582.
+\end{itemize}
+
+The authors chose this technique because:
+\begin{itemize}
+    \item It provides detailed turbulence statistics.
+    \item It allows for quantification of particle lag effects.
+    \item It enables correction of Reynolds stress measurements.
+\end{itemize}
+
+\subsection{Key Conclusions}
+\begin{enumerate}
+    \item Particle lag significantly affects the magnitude of turbulence quantities in high-speed flows.
+    \item Normal-to-wall stress is most susceptible to frequency filtering effects due to particle lag.
+    \item Semi-local scaling shows better agreement with incompressible flows than conventional Morkovin's scaling.
+\end{enumerate}
+
+\subsection{Suggested Improvements}
+\begin{enumerate}
+    \item Develop direct measurement techniques for Reynolds stress spectra in supersonic flows.
+    \item Implement advanced particle tracking methods for better lag quantification.
+    \item Extend the study to higher Mach numbers and different flow configurations.
+\end{enumerate}
+
+
+\section{Conclusion}
+
+\begin{enumerate}
+    \item Both studies highlight the critical importance of particle behavior in supersonic flow measurements and the importance of having a good reference mask, accurate particle tracking, and a high-quality camera.
+    \item The complementary nature of PLMS and LDV techniques provides comprehensive flow field information when both are used together.
+    \item Particle lag effects must be carefully considered in both visualization and quantitative measurements.
+\end{enumerate}
+
+
+\end{document}

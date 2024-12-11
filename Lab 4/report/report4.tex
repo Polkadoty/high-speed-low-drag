@@ -1,0 +1,368 @@
+\documentclass{article}
+
+%package setup
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{fancyhdr}
+\usepackage[margin=1in]{geometry}
+\usepackage{comment}
+\usepackage{placeins}
+\usepackage{parskip}
+\usepackage{subcaption}
+\usepackage{appendix}
+\usepackage{soul}
+\usepackage{comment}
+\PassOptionsToPackage{hyphens}{url}\usepackage[hidelinks]{hyperref}
+\usepackage{matlab-prettifier}
+\usepackage{minted}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{textcomp, gensymb}
+\usepackage{tikz}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\usetikzlibrary{arrows.meta, positioning, decorations.pathmorphing}
+\usepackage{caption}
+
+\pagestyle{fancy}
+\fancyhf{} % Clear header/footer settings
+\rhead{\thepage} % Page number on the right in the header
+\lhead{ASE162M Report 4} % Your report title on the left
+
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \includegraphics[width=10cm]{ase-logo-formal.png}  % Adjust the width as needed
+  \vspace{1cm}  % Add some vertical space
+ 
+  \Large \textbf{ASE 162M High-Speed Aerodynamics}\\
+  \large \textbf{Section 14275}\\
+  \vspace{0.5cm}
+  \textbf{Tuesday: 4:00 - 6:00 pm}\\
+ 
+  \vspace{1cm}
+ 
+  \hrule
+  \vspace{0.5cm}
+ 
+  \begin{center}
+  \Huge \textbf{Temperature Sensitive Paint Measurements}\\
+  \end{center}
+ 
+  \vspace{0.5cm}
+  \hrule
+ 
+  \vspace{1cm}  
+ 
+  \normalsize \textbf{Andrew Doty}\\
+  \normalsize \textbf{Due Date: December 10, 2024}
+ 
+\end{titlepage}
+\newpage
+
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+
+\section{Introduction}
+Temperature-Sensitive Paint (TSP) is a powerful non-intrusive diagnostic technique for measuring surface temperatures in aerodynamic testing. This experiment investigates the aerodynamic heating on a space shuttle model in supersonic flow using TSP measurements. By utilizing a specialized paint coating that changes its fluorescence intensity with temperature, we can obtain detailed temperature distributions across the model surface. The experiment is conducted in a variable Mach number wind tunnel with flows ranging from Mach 2 to 3, allowing us to study how different flow conditions affect the heating patterns on the shuttle model. This setup combines pressure measurements, thermocouple readings, and TSP imaging to provide a comprehensive understanding of the heat transfer phenomena occurring during supersonic flight conditions.
+
+
+
+\section{Data Processing, Results, and Discussion}
+
+\subsection{Flow Visualization}
+
+Showing the Schlieren image of the space shuttle model with labeled flow features:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{schlieren.png}
+    \caption{Schlieren Image of the Space Shuttle Model}
+    \label{fig:schlieren_image}
+\end{figure}
+
+\begin{enumerate}
+    \item \textbf{Bow Shock}: A detached shock in front of the shuttle’s nose caused by the blunt body compressing the supersonic flow.
+    \item \textbf{Boundary Layer}: A thin layer of slower-moving air near the shuttle’s surface due to viscous effects, growing along the surface.
+    \item \textbf{Oblique Shock}: Angled shocks forming at the leading edges of the shuttle’s wings as the flow turns into itself.
+    \item \textbf{Expansion Waves}: Fan-shaped regions where the flow expands and decreases in pressure and temperature.
+    \item \textbf{Mach Waves}: Weak compressive waves caused by small disturbances in the supersonic flow.
+    \item \textbf{Reflected Shock}: A shock created when the oblique shock reflects off another surface or boundary.
+    \item \textbf{Separation Bubble}: A region where the boundary layer separates from the surface, causing recirculating flow.
+    \item \textbf{Turbulent Wake}: A chaotic region of mixed and decelerated flow downstream of the shuttle.
+    \item \textbf{Recirculation Region}: A low-pressure area behind the shuttle with reversed flow, contributing to drag.
+\end{enumerate}
+
+
+
+\subsection{Experimental Setup}
+
+The experiment was conducted using the Aerolab Variable Mach Number Wind Tunnel, capable of producing supersonic flows with Mach numbers ranging from approximately 2.25 to 3. The test section of the wind tunnel is nominally 3" * 3". A space shuttle model was mounted along the rear wall of the test section with temperature sensitive paint applied to the surface.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{lab-schematic.png}
+    \caption{Experimental setup for Lab 4: Temperature Sensitive Paint Measurements.}
+    \label{fig:lab4_setup}
+\end{figure}
+
+
+\begin{table}[H]
+    \centering
+    \caption{TSP System Components and Functions}
+    \renewcommand{\arraystretch}{1.5} % Adjust row height
+    \begin{tabularx}{\textwidth}{|p{3.5cm}|X|} % Use X for flexible width
+    \hline
+    \textbf{Component} & \textbf{Function} \\
+    \hline
+    UV LED & Excites the Temperature-Sensitive Paint (TSP) layer on the shuttle model, inducing fluorescence proportional to temperature changes. \\
+    \hline
+    TSP Coating & Measures surface temperature by fluorescing at varying intensities depending on the local temperature of the model. \\
+    \hline
+    Thermocouple & Records surface temperature at specific points for calibration of the TSP measurements. \\
+    \hline
+    Color Filter (Schott OG 570) & Filters specific wavelengths of light to enhance the sensitivity of the TSP fluorescence captured by the camera. \\
+    \hline
+    CCD Camera & Captures fluorescence from the TSP layer, creating high-resolution images of the temperature distribution on the shuttle surface. \\
+    \hline
+    Photodiode & Monitors the UV LED and camera status to synchronize the image capture process. \\
+    \hline
+    Wind Tunnel & Provides a controlled supersonic flow environment for the shuttle model, generating temperature gradients for TSP analysis. \\
+    \hline
+    Data Acquisition System (DAQ) & Collects and digitizes signals from the thermocouple, pressure transducers, and photodiode for data analysis. \\
+    \hline
+    Pressure Transducers & Measure stagnation and static pressures to relate temperature and flow conditions in the test section. \\
+    \hline
+    PC & Controls the experiment, stores data, and processes images from the camera for further analysis. \\
+    \hline
+    \end{tabularx}
+    \label{tab:tsp_components}
+\end{table}
+
+\subsection{Pressure Measurements and Mach Number}
+
+For the pressure measurements and mach number, we used the pressure transducers to measure the stagnation and static pressures. I then converted using the conversion factors of 4137 kPa per volt and 1034 kPa per volt respectively to get the stagnation and static pressures in kPa. For one of the Mach 2.0 runs, I got the following:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Q3_M20.png}
+    \caption{Pressure Data for Mach 2.0}
+    \label{fig:pressure_data}
+\end{figure}
+
+\subsection{Calibration Curve for I/Iref and T/Tref}
+
+After running a python script to process the data, I got the following values for Irat and dIrat:
+
+\begin{table}[H]
+    \centering
+    \caption{Irat and dIrat Values}
+    \begin{tabular}{|c|c|}
+        \hline
+        \textbf{Irat} & \textbf{dIrat} \\
+        \hline
+        0.886 & 0.0161 \\
+        0.865 & 0.0155 \\
+        0.849 & 0.0155 \\
+        0.914 & 0.0174 \\
+        0.889 & 0.0166 \\
+        0.870 & 0.0161 \\
+        0.926 & 0.0192 \\
+        0.900 & 0.0179 \\
+        0.881 & 0.0171 \\
+        \hline
+    \end{tabular}
+    \label{tab:irat_dirat}
+\end{table}
+
+When plotted, these values form a mostly-linear curve with some variance for each iteration, and you can see that there is cooling across the model for each run from 1 to 3.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{tsp_calibration.png}
+    \caption{Irat and dIrat Values}
+    \label{fig:tsp_calibration}
+\end{figure}
+
+In casae you can't see the last blue Mach 2 datapoint, it is behind one of the other datapoints.
+
+\subsection{Problem 5}
+
+I used the following approach to create the temperature maps:
+
+First, each image file (.dat format) was loaded using a script to convert each data point into a pixel value. The file contained columns of data, and the intensity values were extracted and inverted for later calculations. The image was reshaped into its spatial dimensions, ensuring proper alignment with the physical experiment.
+
+To reduce noise in the raw intensity data, a Gaussian filter was applied. This removed high-frequency noise while preserving the overall data trends. This results in cleaner temperature distributions, aiding in more accurate thresholding and masking.
+
+To automatically mask out the region of interest with OpenCV, two points were manually selected: one for the background and one for the shuttle. The threshold was calculated as the average of these two intensity values:
+
+The mask was applied to exclude regions below the threshold, effectively isolating the shuttle's thermal data.
+
+The inverted intensity values were converted into temperatures using the calibration curve from the previous section.
+
+To ensure consistent color scaling across all images, the global temperature range was calculated as: taking the $5^{\text{th}}$ and $95^{\text{th}}$ percentiles of the valid temperatures, and then scaling the data to fit within the range of 0 to 255 for display in a heatmap. Each temperature map was visualized with a consistent color scale. A colormap was applied, and masked regions were set to white for clarity.
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{temperature-maps.png}
+    \caption{Temperature Maps}
+    \label{fig:temperature_maps}
+\end{figure}
+
+\subsection{Problem 6}
+
+It is pretty clear from this graph that the model is cooling down as the flow continues to pass over the object. This makes sense, as the flow is accelerating over the stationary object, and therefore any post-shock heating is being taken away from the surface. It does match what the thermocouple measurements show in question 2, as the temperature decreases by around 15 degrees over the course of the run.
+
+
+\subsection{Problem 7}
+
+\begin{table}[H]
+    \centering
+    \caption{Oblique Shock Properties with Uncertainties}
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        \textbf{Property} & \textbf{M = 2.0} & \textbf{M = 2.5} & \textbf{M = 3.0} \\
+        \hline
+        $P_2$ (kPa) & $96.06 \pm 13.42$ & $65.02 \pm 15.08$ & $47.99 \pm 17.22$ \\
+        $T_2$ (K) & $259.6 \pm 2.21$ & $265.9 \pm 2.43$ & $266.6 \pm 2.37$ \\
+        $V_2$ (m/s) & $466.9 \pm 15.26$ & $612.4 \pm 13.34$ & $737.9 \pm 12.36$ \\
+        $\rho_2$ (kg/m³) & $1.289 \pm 0.1805$ & $0.852 \pm 0.1977$ & $0.6274 \pm 0.2252$ \\
+        $\mu_2$ (Pa·s) & $(1.648 \pm 1.166e-07) \times 10^{-5}$ & $(1.68 \pm 1.153e-07) \times 10^{-5}$ & $(1.683 \pm 1.152e-07) \times 10^{-5}$ \\
+        $Re$ & $1.242e+06 \pm 1.812e+05$ & $1.056e+06 \pm 2.474e+05$ & $9.352e+05 \pm 3.367e+05$ \\
+        $T_r$ (K) & $355.9 \pm 6.99$ & $431.6 \pm 7.999$ & $507.2 \pm 8.933$ \\
+        \hline
+    \end{tabular}
+    \label{tab:shock_properties_uncertainties}
+\end{table}
+
+\subsubsection{Uncertainty Analysis}
+
+Uncertainties for the oblique shock calculations were propagated using the sequential perturbation method, chosen for its robustness with complex, non-linear equations.
+
+The primary sources of uncertainty in our measurements were:
+\begin{itemize}
+    \item Mach number ($M_1$): $\pm 0.03$ (typical for supersonic wind tunnels)
+    \item Temperature measurements ($T$): $\pm 3$ K (from TSP calibration)
+    \item Pressure measurements ($P$): $\pm 2$ kPa (from transducer calibration)
+\end{itemize}
+
+\subsubsection{Sequential Perturbation Method}
+For each property $X$ that depends on variables $x_i$, the uncertainty $\delta X$ was calculated as:
+
+\begin{equation}
+    \delta X = \sqrt{\sum_{i=1}^n \left(\frac{X(x_i + \delta x_i) - X(x_i - \delta x_i)}{2}\right)^2}
+\end{equation}
+
+where:
+\begin{itemize}
+    \item $X(x_i + \delta x_i)$ is the property calculated with variable $i$ perturbed high
+    \item $X(x_i - \delta x_i)$ is the property calculated with variable $i$ perturbed low
+\end{itemize}
+
+
+
+The uncertainties indicate:
+\begin{itemize}
+    \item Pressure measurements have moderate uncertainties ($\sim 6\text{-}9\%$)
+    \item Temperature measurements show lower uncertainties ($\sim 1\text{-}2\%$)
+    \item Velocity calculations are precise ($\sim 0.5\text{-}1\%$ uncertainty)
+    \item Reynolds numbers exhibit significant uncertainty due to propagation through multiple calculations
+\end{itemize}
+
+\subsubsection{Equations Used}
+
+\begin{align}
+    \text{1. } & \tan \theta = 2 \cot \beta \frac{M_1^2 \sin^2 \beta - 1}{M_1^2(\gamma + \cos 2\beta) + 2} \\
+    \text{2. Pressure Ratio: } & \frac{P_2}{P_1} = \frac{2\gamma M_{n1}^2 - (\gamma-1)}{\gamma+1} \\
+    \text{3. Temperature Ratio: } & \frac{T_2}{T_1} = \frac{[2\gamma M_{n1}^2 - (\gamma-1)][({\gamma-1})M_{n1}^2 + 2]}{(\gamma+1)^2M_{n1}^2} \\
+    \text{4. Density Ratio: } & \frac{\rho_2}{\rho_1} = \frac{(\gamma+1)M_{n1}^2}{(\gamma-1)M_{n1}^2 + 2} \\
+    \text{5. Stagnation Pressure Ratio: } & \frac{P_{02}}{P_{01}} = \left(\frac{(\gamma+1)M_{n1}^2}{(\gamma-1)M_{n1}^2 + 2}\right)^{\gamma/(\gamma-1)} \left(\frac{\gamma+1}{2\gamma M_{n1}^2 - (\gamma-1)}\right)^{1/(\gamma-1)} \\
+    \text{6. Velocity Behind Shock: } & V_2 = V_1\sqrt{\frac{(\gamma-1)M_{n1}^2 + 2}{2\gamma M_{n1}^2 - (\gamma-1)}} \\
+    \text{7. Viscosity Calculation (Sutherland's Law): } & \mu = \mu_0 \left(\frac{T}{T_0}\right)^{3/2} \frac{T_0 + S}{T + S} \\
+    \text{8. Reynolds Number: } & Re_L = \frac{\rho V L}{\mu} \\
+    \text{9. Recovery Temperature: } & T_r = T_{\infty}\left(1 + r\frac{\gamma-1}{2}M_{\infty}^2\right) \\
+    \text{10. Nusselt Number (Turbulent Flow): } & Nu_L = 0.0296 \cdot Re_L^{4/5} \cdot Pr^{1/3} \\
+    \text{11. Heat Transfer Coefficient: } & h = \frac{Nu_L \cdot k}{L} \\
+    \text{12. Heat Flux: } & q = h(T_r - T_s) \\
+\end{align}
+
+\subsubsection{Constants Used}
+\begin{itemize}
+    \item $\gamma = 1.4$ (ratio of specific heats for air)
+    \item $R = 287 \, \text{J/kg-K}$ (gas constant for air)
+    \item $Pr = 0.7$ (Prandtl number for air)
+    \item $k = 0.02 \, \text{W/m-K}$ (thermal conductivity of air)
+\end{itemize}
+
+\subsection{Problem 8}
+
+Using the Reynolds number equations from the previous section, I can calculate the Nusselt number for each of the runs. 
+$$
+Nu_L = 0.0296 \cdot Re_L^{4/5} \cdot Pr^{1/3}
+$$
+
+In this case I used the values mentioned in the lab assignment and got the following plot:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Q8_nusselt_comparison.png}
+    \caption{Nusselt Number for Each Run}
+    \label{fig:nusselt_number}
+\end{figure}
+
+There is high variance because I had a high uncertainty for the Reynolds number from my propagated uncertainties in the last problem. Is this uncertainty too high? Probably.
+
+\subsection{Problem 9}
+
+Using the equation for heat transfer rate from the thermocouple measurements, I can calculate the heat transfer rate for each of the runs.
+$$
+q(t) = h * (T_r - T_{tc}(t))
+$$
+
+In this case $T_{tc}(t)$ is the temperature of the thermocouple at time $t$, $T_r$ is the recovery temperature, and $h$ is the convective heat flux coefficient.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Q9_heat_transfer.png}
+    \caption{Heat Transfer Rate for Each Run}
+    \label{fig:heat_transfer_rate}
+\end{figure}
+
+
+The heat transfer rate ($q(t)$) plot shows how heat is transferred from the surface during each run.
+
+\begin{enumerate}
+    \item \textbf{Start of the Run:} At first, the heat transfer rate is low because the system hasn't fully adjusted to the flow.
+    
+    \item \textbf{Rising Heat Transfer:} As the flow accelerates, the heat transfer rate increases, reaching its peak. The faster the flow (higher Mach number), the larger this peak is because more energy is transferred to the surface.
+    
+    \item \textbf{Peak and Decline:} The heat transfer rate peaks at around 20 seconds for Mach 3 and decreases afterward. This is because the system stabilizes, and the surface loses heat more efficiently over time.
+    
+    \item \textbf{Comparison Across Mach Numbers:} Higher Mach numbers show higher heat transfer rates overall because faster flow leads to more heat transfer.
+\end{enumerate}
+
+
+\subsection{Problem 10}
+
+The results indicate that heat transfer occurs from the model surface to the surrounding flow. Initially, the heat transfer rate starts at a steady-state value. As the flow accelerates over the model, the heat transfer rate peaks due to increased convective effects and then decreases over time as the system stabilizes and the heat is dissipated. 
+
+The magnitude of the heat flux is largest at Mach 3, occurring approximately 20 seconds into the run. This peak corresponds to the maximum convective heating due to the higher velocity and density of the flow at Mach 3, resulting in greater energy transfer away from the model surface.
+
+This behavior aligns with expectations, as the accelerated flow over the model surface increases the convective heat transfer initially. However, as the flow stabilizes and the heat removal becomes more efficient, the heat transfer rate decreases.
+
+\subsection{Problem 11}
+
+During atmospheric re-entry, the scenario differs significantly from the wind tunnel experiment. In re-entry, the spacecraft moves at hypersonic speeds into relatively static atmospheric flow. This creates intense compression and shock waves in front of the spacecraft, resulting in extremely high temperatures and heat fluxes concentrated on the leading edges and bottom surface of the spacecraft.
+
+In contrast, the wind tunnel experiment involves supersonic flow moving over a stationary object. While the flow generates post-shock heating and convective heat transfer, the magnitude of heat flux is far smaller than in re-entry conditions. The primary differences arise from the relative motion of the object and the flow, as well as the vastly higher Mach numbers involved in hypersonic re-entry, which amplify the heat transfer rates by several orders of magnitude.
+
+To make the wind tunnel test more representative of atmospheric re-entry, modifications such as higher flow velocities to simulate hypersonic speeds, a rotating or moving model to replicate relative motion, or using higher fidelity materials to mimic spacecraft surface properties could be implemented.
+
+
+
+\end{document}

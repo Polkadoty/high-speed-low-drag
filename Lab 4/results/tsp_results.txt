@@ -1,0 +1,15 @@
+
+M2:
+Run 1: Irat = 0.886361, dIrat = 0.016146
+Run 2: Irat = 0.864615, dIrat = 0.015541
+Run 3: Irat = 0.848535, dIrat = 0.015452
+
+M2.5:
+Run 1: Irat = 0.913784, dIrat = 0.017447
+Run 2: Irat = 0.888946, dIrat = 0.016636
+Run 3: Irat = 0.869854, dIrat = 0.016064
+
+M3:
+Run 1: Irat = 0.925674, dIrat = 0.019203
+Run 2: Irat = 0.900229, dIrat = 0.017891
+Run 3: Irat = 0.880660, dIrat = 0.017110
